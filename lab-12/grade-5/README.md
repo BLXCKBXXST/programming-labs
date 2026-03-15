@@ -2,11 +2,22 @@
 
 Добавлено измерение времени через `gettimeofday()` и динамическая библиотека `.so`.
 
-## Сборка
+## Сборка вручную
 ```bash
-make
+# 1. компилируем с -fPIC (обязательно для .so)
+gcc -Wall -Iinclude -fPIC -c src/sneakers.c -o sneakers.o
+
+# 2. статическая библиотека
+ar rcs libsneakers.a sneakers.o
+
+# 3. динамическая библиотека
+gcc -Wall -Iinclude -fPIC -shared src/sneakers.c -o libsneakers.so
+
+# 4. линкуем со статической
+gcc -Wall -Iinclude src/main.c libsneakers.a -o sneakers
+
+# 5. запускаем
 ./sneakers
-make clean
 ```
 
 ## Разница между статической и динамической библиотекой

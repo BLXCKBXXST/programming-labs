@@ -1,6 +1,6 @@
 # Lab 12 — Grade 4
 
-Разбито на 3 файла. Статическая библиотека собирается через Makefile.
+Разбито на 3 файла. Статическая библиотека собирается вручную.
 
 ## Структура
 ```
@@ -8,16 +8,23 @@ grade-4/
 ├── src/
 │   ├── main.c
 │   └── sneakers.c
-├── include/
-│   └── sneakers.h
-└── Makefile
+└── include/
+    └── sneakers.h
 ```
 
-## Сборка
+## Сборка вручную
 ```bash
-make
+# 1. компилируем sneakers.c в объектный файл
+gcc -Wall -Iinclude -c src/sneakers.c -o sneakers.o
+
+# 2. собираем статическую библиотеку из объектного файла
+ar rcs libsneakers.a sneakers.o
+
+# 3. линкуем main.c со статической библиотекой
+gcc -Wall -Iinclude src/main.c libsneakers.a -o sneakers
+
+# 4. запускаем
 ./sneakers
-make clean
 ```
 
 ## Смысл статической библиотеки
