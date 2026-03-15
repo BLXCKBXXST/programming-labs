@@ -2,46 +2,37 @@
 
 ## Что реализовано
 
-Включает всё из оценок 3 и 4, плюс:
+### Многомодульный CMake (несколько библиотек)
 
-### 9. Источник задания
+Проект разбит на несколько библиотек через `add_subdirectory`.
 
-Склонирована ветка `cmake_task` из:
-> https://github.com/kruffka/C-Programming/tree/cmake_task
-
-### 10. Структура проекта
+### Структура папок
 
 ```
 grade-5/
-├── CMakeLists.txt          — корневой
-├── src/main.c
+├── CMakeLists.txt       — корневой: add_subdirectory + add_executable
+├── src/
+│   └── main.c              — использует background-библиотеку
 ├── pipes/
-│   ├── CMakeLists.txt        — статическая библиотека pipes
-│   ├── pipes.h
-│   ├── read_pipe.c
-│   └── write_pipe.c
+│   └── CMakeLists.txt      — add_library(pipes ...)
 └── background/
-    ├── CMakeLists.txt        — статическая библиотека background
-    ├── background.h
-    └── background.c
+    └── CMakeLists.txt      — add_library(background ...), зависит от pipes
 ```
 
-### 11. Команды в CMakeLists.txt
+### Цепочка зависимостей
 
-| Команда | Что делает |
-|---|---|
-| `cmake_minimum_required` | минимальная версия CMake |
-| `project(...)` | имя проекта и язык |
-| `add_subdirectory(pipes)` | подключает `pipes/CMakeLists.txt` |
-| `add_subdirectory(background)` | подключает `background/CMakeLists.txt` |
-| `add_library(pipes STATIC ...)` | создаёт статическую библиотеку из файлов |
-| `target_include_directories(... PUBLIC ...)` | кто линкуется — видит заголовки |
-| `target_link_libraries(... PRIVATE pipes)` | `background` зависит от `pipes`, но наружу это не пробрасывается |
-| `add_executable(cmake_task ...)` | создаёт исполняемый файл |
+```
+pipes ← background ← cmake_task
+```
 
-**PUBLIC vs PRIVATE:**
-- `PUBLIC` — доступно и внутри таргета, и всем кто на него линкуется
-- `PRIVATE` — только внутри таргета, наружу не пробрасывается
+### `add_subdirectory` в действии
+
+```cmake
+add_subdirectory(pipes)        # собирает библиотеку pipes
+add_subdirectory(background)   # собирает библиотеку background
+add_executable(cmake_task src/main.c)
+target_link_libraries(cmake_task PRIVATE background)
+```
 
 ## Сборка и запуск
 
