@@ -10,9 +10,9 @@ typedef struct {
     int  price;
 } Sneaker;
 
-// узел со ссылкой на структуру (п.б4) + next/prev
+// узел со ссылкой на структуру (п.Ц4) + next/prev
 typedef struct Node {
-    Sneaker     *data;   // указатель на структуру (п.б4)
+    Sneaker     *data;   // указатель на отдельно выделенную Sneaker
     struct Node *next;
     struct Node *prev;
 } Node;
@@ -21,10 +21,8 @@ Sneaker *CreateSneaker(void) {
     char *brands[] = {"Nike", "Adidas", "Puma"};
     char *models[] = {"Pro", "Super", "Ultra"};
     int   prices[] = {200, 250, 300, 350, 400, 450, 500};
-
     Sneaker *s = malloc(sizeof(Sneaker));
-    int b = rand() % 3;
-    int m = rand() % 3;
+    int b = rand() % 3, m = rand() % 3;
     strcpy(s->brand, brands[b]);
     strcpy(s->model, models[m]);
     s->size  = 36 + rand() % 9;
@@ -34,7 +32,7 @@ Sneaker *CreateSneaker(void) {
 
 Node *CreateNode(void) {
     Node *node = malloc(sizeof(Node));
-    node->data = CreateSneaker();  // инициализируем указатель на данные
+    node->data = CreateSneaker();
     node->next = NULL;
     node->prev = NULL;
     return node;
@@ -42,11 +40,8 @@ Node *CreateNode(void) {
 
 void PushBack(Node **head, Node **tail) {
     Node *node = CreateNode();
-    if (*head == NULL) {
-        *head = *tail = node;
-        return;
-    }
-    node->prev  = *tail;
+    if (*head == NULL) { *head = *tail = node; return; }
+    node->prev    = *tail;
     (*tail)->next = node;
     *tail = node;
 }
@@ -70,41 +65,31 @@ int main(int argc, char *argv[]) {
     int n;
     if (argc > 1) n = atoi(argv[1]);
     else { printf("n: "); scanf("%d", &n); }
-
     srand(time(NULL));
     Node *head = NULL, *tail = NULL;
     for (int i = 0; i < n; i++) PushBack(&head, &tail);
 
-    // навигация WASD
     Node *cur = head;
-    int   idx = 1;
-    int   running = 1;
-
-    printf("Навигация: D/6 - вперёд, A/4 - назад, Q - выход\n");
-    printf("Текущий узел:\n");
+    int   idx = 1, running = 1;
+    printf("Навигация: D/6 — вперёд, A/4 — назад, Q — выход\n");
     PrintNode(cur, idx);
 
     char ch;
     while (running) {
-        printf("Ввод: ");
-        scanf(" %c", &ch);
+        printf("Ввод: "); scanf(" %c", &ch);
         switch (ch) {
             case 'D': case 'd': case '6':
                 if (cur->next) { cur = cur->next; idx++; PrintNode(cur, idx); }
-                else printf("Достигли конца списка. Вернуться в начало? (y/n): "), scanf(" %c", &ch), (ch=='y')?(cur=head,idx=1,PrintNode(cur,idx)):0;
+                else { printf("Конец списка. Вернуться к S? (y/n): "); scanf(" %c", &ch); if (ch=='y') { cur=head; idx=1; PrintNode(cur,idx); } }
                 break;
             case 'A': case 'a': case '4':
                 if (cur->prev) { cur = cur->prev; idx--; PrintNode(cur, idx); }
                 else printf("Начало списка.\n");
                 break;
-            case 'Q': case 'q':
-                running = 0;
-                break;
-            default:
-                printf("Неизвестная команда.\n");
+            case 'Q': case 'q': running = 0; break;
+            default: printf("Неизвестная команда.\n");
         }
     }
-
     FreeList(head);
     return 0;
 }
