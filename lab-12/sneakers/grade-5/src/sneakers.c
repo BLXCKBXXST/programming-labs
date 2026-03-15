@@ -4,7 +4,7 @@
 #include <time.h>
 #include "sneakers.h"
 void FillSneakersN(Sneaker *s, int n) {
-    char *brands[]={"Ника","Адидас","Пума"}; char *models[]={"Pro","Super","Ultra"};
+    char *brands[]={"Nike","Adidas","Puma"}; char *models[]={"Pro","Super","Ultra"};
     int p[3][3]={{200,350,500},{250,400,600},{300,450,700}};
     srand(time(NULL));
     for(int i=0;i<n;i++){int b=rand()%3,m=rand()%3;
