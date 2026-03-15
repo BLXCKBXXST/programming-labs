@@ -10,14 +10,22 @@ typedef struct {
     int  price;
 } Sneaker;
 
-// узел зигзагообразного списка (вариант со схемы):
-// next  - вправо в своём ряду
-// cross - вниз (из верхнего) или вверх (из нижнего)
+// узел зигзагообразного списка согласно схеме:
+//
+// S → [a1] → [a3] → [a5] → ... → [aN-1] → nil
+//       ↓       ↓     ↓               ↓
+//     [a2]  ← [a4] ← [a6] ← ... ← [aN]
+//     nil      nil    nil            nil
+//
+// верхний ряд: next → вправо
+// нижний ряд:  next → влево (т.е. a4->next = a2, a6->next = a4 ...)
+// cross: верхний узел → соответствующий нижний (только вниз↓)
+// у нижнего узла cross → обратно вверх
 typedef struct Node {
     Sneaker     *data;
-    struct Node *next;   // вправо
-    struct Node *cross;  // верх/вниз
-    int          row;    // 0 = верхний ряд, 1 = нижний
+    struct Node *next;   // верхний: вправо | нижний: влево
+    struct Node *cross;  // вверх/вниз между рядами
+    int          row;    // 0 = верхний, 1 = нижний
 } Node;
 
 Sneaker *CreateSneaker(void) {
@@ -48,10 +56,22 @@ void PrintNode(Node *node) {
            node->data->size,  node->data->price);
 }
 
-void FreeRow(Node *head) {
-    while (head) {
-        Node *tmp = head;
-        head = head->next;
+void FreeAll(Node *topHead, Node *botTail) {
+    // верхний ряд — идём вправо
+    Node *cur = topHead;
+    while (cur) {
+        Node *tmp = cur;
+        cur = cur->next;
+        free(tmp->data);
+        free(tmp);
+    }
+    // нижний ряд — у нас есть хвост (самый правый = первый добавленный)
+    // но мы его уже освободили через cross? нет — cross не владеет памятью
+    // идём от botTail влево через next
+    cur = botTail;
+    while (cur) {
+        Node *tmp = cur;
+        cur = cur->next;  // next у нижних идёт влево
         free(tmp->data);
         free(tmp);
     }
@@ -66,7 +86,7 @@ int main(int argc, char *argv[]) {
     }
     srand(time(NULL));
 
-    // строим верхний ряд (a1, a3, a5... — нечётные по позиции)
+    // строим верхний ряд: topHead → a1 → a3 → ... → nil
     Node *topHead = NULL, *topTail = NULL;
     for (int i = 0; i < N; i++) {
         Node *node = CreateNode(0);
@@ -74,30 +94,59 @@ int main(int argc, char *argv[]) {
         else { topTail->next = node; topTail = node; }
     }
 
-    // строим нижний ряд (a2, a4, a6... — идут в обратном порядке)
-    Node *botHead = NULL, *botTail = NULL;
+    // строим нижний ряд в обратном порядке:
+    // добавляем каждый новый узел В НАЧАЛО → получаем next влево
+    // botTail — самый правый (последний добавленный в конец верхнего)
+    // botHead — самый левый (крайний левый нижнего ряда, next = nil)
+    Node *botHead = NULL;  // самый левый нижнего ряда (next = nil)
+    Node *botTail = NULL;  // самый правый нижнего ряда
     for (int i = 0; i < K; i++) {
         Node *node = CreateNode(1);
-        if (!botHead) botHead = botTail = node;
-        else { botTail->next = node; botTail = node; }
+        // добавляем в начало: node->next = текущий botHead
+        node->next = botHead;
+        botHead = node;
+        if (!botTail) botTail = node;  // первый добавленный = самый правый
+    }
+    // теперь: botTail — самый правый (a_K позиция), next у него = botHead...
+    // нет: botTail = первый созданный, т.е. самый правый визуально
+    // botHead = последний созданный, т.е. самый левый (a2)
+
+    // проставляем cross: i-й узел верхнего ↔ i-й узел нижнего (считая слева)
+    // нижний ряд слева направо: botHead → (next ← т.е. идём от botTail)
+    // нам нужно пройти нижний ряд слева направо —
+    // соберём указатели нижнего ряда в массив для удобства
+    Node **bot = malloc(K * sizeof(Node *));
+    {
+        // нижний ряд слева направо: botHead, botHead->cross?
+        // нет — у нас next идёт влево. Соберём через обход от botTail вправо?
+        // botTail->next указывает влево (к botTail-1)...
+        // проще: пройдём от botHead по next — это даст порядок влево,
+        // значит botHead — это a2 (самый левый), next от него = nil
+        // а botTail — это aK (самый правый)
+        // для cross нам нужно: top[0]↔bot[0](самый левый=a2),
+        //                       top[1]↔bot[1](следующий левый=a4) ...
+        // пройдём от botTail и соберём в обратном порядке
+        Node *cur = botTail;
+        for (int i = K - 1; i >= 0; i--) {
+            bot[i] = cur;
+            cur = cur->next;
+        }
     }
 
-    // проставляем cross-указатели (верх <-> низ)
-    // если один ряд длиннее - лишним cross = NULL (п.б7)
-    Node *t = topHead, *b = botHead;
-    while (t && b) {
-        t->cross = b;
-        b->cross = t;
+    Node *t = topHead;
+    for (int i = 0; i < N && i < K; i++) {
+        t->cross  = bot[i];
+        bot[i]->cross = t;
         t = t->next;
-        b = b->next;
     }
-    // оставшиеся узлы выходящего за короткий - cross = NULL
+    // лишние узлы длинного ряда — cross = NULL (п.7)
     while (t) { t->cross = NULL; t = t->next; }
-    while (b) { b->cross = NULL; b = b->next; }
+    for (int i = (N < K ? N : K); i < K; i++) bot[i]->cross = NULL;
+    free(bot);
 
-    // начинаем с S (верхний ряд, первый элемент)
+    // навигация
     Node *cur = topHead;
-    printf("Навигация: D/6 - вправо, A/4 - назад, S/2 - вниз, W/8 - вверх, R - в начало, Q - выход\n");
+    printf("Навигация: D/6 вправо(верх)/влево(низ), A/4 обратно, S/2 вниз, W/8 вверх, R - к S, Q выход\n");
     printf("Текущий:\n");
     PrintNode(cur);
 
@@ -108,22 +157,37 @@ int main(int argc, char *argv[]) {
         scanf(" %c", &ch);
         switch (ch) {
             case 'D': case 'd': case '6':
-                if (cur->next) { cur = cur->next; PrintNode(cur); }
-                else {
-                    printf("Конец ряда. Вернуться к S? (y/n): ");
-                    scanf(" %c", &ch);
-                    if (ch == 'y') { cur = topHead; PrintNode(cur); }
+                // в верхнем: next вправо; в нижнем: движение "вправо" = против next (к botTail)
+                if (cur->row == 0) {
+                    if (cur->next) { cur = cur->next; PrintNode(cur); }
+                    else {
+                        printf("Конец верхнего ряда. Вернуться к S? (y/n): ");
+                        scanf(" %c", &ch);
+                        if (ch == 'y') { cur = topHead; PrintNode(cur); }
+                    }
+                } else {
+                    // в нижнем ряду "вправо" — идём к узлу у которого next == cur
+                    // т.е. ищем узел правее текущего
+                    if (cur->cross && cur->cross->next &&
+                        cur->cross->next->cross) {
+                        // переход: вверх → вправо → вниз
+                        Node *rightTop = cur->cross->next;
+                        if (rightTop && rightTop->cross) { cur = rightTop->cross; PrintNode(cur); }
+                        else printf("Конец нижнего ряда.\n");
+                    } else printf("Конец нижнего ряда.\n");
                 }
                 break;
             case 'A': case 'a': case '4':
-                // для навигации назад ищем prev через cross-цепочку (проходимся от S)
-                {
-                    Node *row = (cur->row == 0) ? topHead : botHead;
-                    if (row == cur) { printf("Начало ряда.\n"); break; }
-                    Node *prev = row;
+                // в верхнем: идём назад (ищем prev через обход от topHead)
+                if (cur->row == 0) {
+                    if (cur == topHead) { printf("Начало верхнего ряда.\n"); break; }
+                    Node *prev = topHead;
                     while (prev->next && prev->next != cur) prev = prev->next;
-                    if (prev->next == cur) { cur = prev; PrintNode(cur); }
-                    else printf("Начало ряда.\n");
+                    cur = prev; PrintNode(cur);
+                } else {
+                    // в нижнем: next идёт влево — это и есть "назад" (к a2)
+                    if (cur->next) { cur = cur->next; PrintNode(cur); }
+                    else printf("Конец нижнего ряда (левый край).\n");
                 }
                 break;
             case 'S': case 's': case '2':
@@ -147,7 +211,21 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    FreeRow(topHead);
-    FreeRow(botHead);
+    // освобождаем память
+    Node *tmp = topHead;
+    while (tmp) { Node *nx = tmp->next; free(tmp->data); free(tmp); tmp = nx; }
+    // нижний ряд: botHead (самый левый, next=nil) → идём к botTail через...
+    // у нас next идёт влево, поэтому от botTail нет прямого обхода вправо
+    // освободим через cross от верхнего — нет, cross не все покрывает
+    // пройдём от botHead: next = nil (он крайний левый), не можем идти вправо
+    // единственный способ — сохранили bot[] но уже free(bot)
+    // решение: освобождаем нижний через cross верхнего + остатки
+    // (в учебном коде это ок — утечка K узлов без cross)
+    tmp = topHead;  // уже освобождён выше, используем заново через cross
+    // правильное решение: до освобождения верхнего сохраняем нижние
+    // переделаем: просто пройдём botHead по next (влево = к nil)
+    tmp = botHead;
+    while (tmp) { Node *nx = tmp->next; free(tmp->data); free(tmp); tmp = nx; }
+
     return 0;
 }
