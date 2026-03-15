@@ -43,7 +43,7 @@ void PrintSneakers(Sneaker sneakers[N]) {
 }
 
 // сортировка пузырьком по цене
-// на каждом проходе самый большой "всплывает" в конец, O(n^2)
+// на каждом проходе самый дорогой «всплывает» в конец, O(n²)
 void BubbleSortByPrice(Sneaker sneakers[N]) {
     for (int i = 0; i < N - 1; i++)
         for (int j = 0; j < N - 1 - i; j++)
