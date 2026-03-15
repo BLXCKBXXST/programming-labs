@@ -18,9 +18,9 @@ void FillRooms(Room rooms[N]) {
     srand(time(NULL));
     for (int i = 0; i < N; i++) {
         strcpy(rooms[i].name, names[rand() % 10]);
-        rooms[i].level      = 1 + rand() % 10;   // уровень 1-10
+        rooms[i].level      = 1 + rand() % 10;
         rooms[i].number     = i + 1;
-        rooms[i].resolution = 5 + rand() % 46;   // размер 5-50
+        rooms[i].resolution = 5 + rand() % 46;
     }
 }
 
@@ -35,7 +35,7 @@ void PrintRooms(Room rooms[N]) {
 }
 
 // сортировка пузырьком по уровню
-// на каждом проходе самая сложная комната "всплывает" в конец
+// на каждом проходе самая сложная комната «всплывает» в конец, O(n²)
 void BubbleSortByLevel(Room rooms[N]) {
     for (int i = 0; i < N-1; i++)
         for (int j = 0; j < N-1-i; j++)
