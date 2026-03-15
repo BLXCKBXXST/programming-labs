@@ -33,7 +33,7 @@ Room *CreateRoom(int number) {
 
 Node *CreateNode(int number) {
     Node *node = malloc(sizeof(Node));
-    node->data = CreateRoom(number);  // инициализация указателя
+    node->data = CreateRoom(number);
     node->next = NULL;
     node->prev = NULL;
     return node;
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < n; i++) PushBack(&head, &tail, i + 1);
 
     // навигация WASD
-    Node *cur = head;  // S = начало списка
+    Node *cur = head;
     int   idx = 1;
     printf("Навигация: D/6 — вперёд, A/4 — назад, Q — выход\n");
     printf("Текущая комната (S):\n");
