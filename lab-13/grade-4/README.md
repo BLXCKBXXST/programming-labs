@@ -4,10 +4,9 @@
 
 ## Сборка
 ```bash
-mkdir build && cd build
-cmake -DLIB_TYPE=STATIC ..   # или SHARED
-cmake --build .
-./sneakers
+cmake -B build -DLIB_TYPE=STATIC   # или SHARED, папка build создастся автоматически
+cmake --build build
+./build/sneakers
 ```
 
 ## Опция -DCMAKE_BUILD_TYPE
@@ -28,15 +27,13 @@ cmake --build .
 
 ### Пример
 ```bash
-mkdir build && cd build
-
 # Отладка
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-cmake --build .
-gdb ./sneakers
+cmake -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
+gdb ./build/sneakers
 
 # Продакшн
-cmake -DCMAKE_BUILD_TYPE=Release ..
-cmake --build .
-./sneakers
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+./build/sneakers
 ```
