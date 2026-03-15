@@ -1,9 +1,9 @@
-CC      = gcc
-CFLAGS  = -Wall -Iinclude
-AR      = ar
-LIB     = libroom.a
-OBJ     = src/room.o
-BIN     = rooms
+CC     = gcc
+CFLAGS = -Wall -Iinclude
+AR     = ar
+LIB    = libroom.a
+OBJ    = src/room.o
+BIN    = rooms
 
 # цель all: полная сборка проекта
 all: $(BIN)
@@ -12,7 +12,7 @@ all: $(BIN)
 $(LIB): $(OBJ)
 	$(AR) rcs $@ $^
 
-# компиляция исходных файлов в объектные
+# компиляция исходных файлов
 src/room.o: src/room.c include/room.h
 	$(CC) $(CFLAGS) -c $< -o $@
 

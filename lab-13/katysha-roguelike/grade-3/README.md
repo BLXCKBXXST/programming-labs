@@ -10,30 +10,21 @@
 grade-3/
 ├── src/
 │   ├── main.c     — только main()
-│   └── room.c     — реализации функций
+│   └── room.c     — реализации: FillRooms, BubbleSortByLevel, PrintRooms
 ├── include/
-│   └── room.h     — заголовочный файл
+│   └── room.h     — struct Room, #define N, объявления функций
 └── Makefile
 ```
 
 ### 2–4. Makefile с целями `all` и `clean`
 
-Makefile автоматизирует сборку статической библиотеки и линковку. Обязательные цели:
-
-```makefile
-all    # полная сборка проекта
-clean  # удаление .o, .a и исполняемого файла
-```
-
 Цепочка сборки:
-1. `src/room.c` скомпилируется в `src/room.o`
-2. из `room.o` собирается `libroom.a` (статическая библиотека)
-3. `src/main.c` линкуется с `libroom.a` → исполняемый файл `rooms`
-
-## Сборка и запуск
+1. `src/room.c` → `src/room.o`
+2. `src/room.o` → `libroom.a` (статическая библиотека)
+3. `src/main.c` + `libroom.a` → `rooms` (исполняемый файл)
 
 ```bash
-make        # собрать проект (цель all)
-./rooms     # запустить
-make clean  # удалить все промежуточные файлы
+make        # цель all
+./rooms
+make clean  # удаляет .o, .a и rooms
 ```
