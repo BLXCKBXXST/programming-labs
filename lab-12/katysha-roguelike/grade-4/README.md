@@ -2,33 +2,27 @@
 
 ## Что реализовано
 
-Включает всё из оценки 3, плюс:
-
-### 8. Разбивка на 3 файла
+### Структура папок
 
 ```
-include/room.h   — заголовочный: тип Room, объявления функций
-src/room.c      — исходный: реализации FillRooms, BubbleSortByLevel, PrintRooms
-src/main.c      — исходный: только main()
+grade-4/
+├── src/
+│   ├── main.c    — только main(): заполнить, сортировать, вывести
+│   └── room.c    — реализация: FillRooms, BubbleSortByLevel, PrintRooms
+├── include/
+│   └── room.h    — struct Room, #define N 100, объявления функций
+└── Makefile
 ```
 
-### 9. Статическая библиотека `.a`
+### Makefile: цели `all` и `clean`, статическая библиотека
 
-Статическая библиотека — это архив скомпилированных объектных файлов (`.o`).
-при линковке код библиотеки вставляется прямо в исполняемый файл.
-
-### 10. Линковка и запуск
+Цепочка сборки:
+1. `src/room.c` → `src/room.o`
+2. `src/room.o` → `libroom.a`
+3. `src/main.c` + `libroom.a` → `rooms`
 
 ```bash
-# 1. компиляция room.c в объектный файл
-gcc -Wall -Iinclude -c src/room.c -o room.o
-
-# 2. сборка статической библиотеки
-ar rcs libroom.a room.o
-
-# 3. линковка main.c с библиотекой и запуск
-gcc -Wall -Iinclude src/main.c libroom.a -o rooms
+make        # цель all
 ./rooms
+make clean  # удаляет .o, .a, rooms
 ```
-
-> `ar rcs` — утилита архивации. `r` — добавить/заменить файл, `c` — создать архив, `s` — индекс символов.
