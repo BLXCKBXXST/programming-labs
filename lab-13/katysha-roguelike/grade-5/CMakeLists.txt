@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+project(roguelike_cmake C)
+set(CMAKE_C_STANDARD 99)
+add_subdirectory(pipes)
+add_subdirectory(background)
+add_executable(cmake_task src/main.c)
+target_link_libraries(cmake_task PRIVATE background)

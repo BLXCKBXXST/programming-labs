@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+project(sneakers_lab13 C)
+set(CMAKE_C_STANDARD 99)
+add_library(sneakers STATIC src/sneakers.c)
+target_include_directories(sneakers PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_executable(sneakers_app src/main.c)
+target_link_libraries(sneakers_app PRIVATE sneakers)
