@@ -2,45 +2,31 @@
 
 ## Что реализовано
 
-Всё в одном файле `main.c`.
-
-### 1. Структура узла односвязного списка
-
-Данные узла — структура `Sneaker` из лабы 12.
+### Односвязный список узлов Sneaker
 
 ```c
-typedef struct {
-    char brand[20];
-    char model[20];
-    int  size;
-    int  price;
-} Sneaker;
-
 typedef struct Node {
-    Sneaker      data;   // данные хранятся внутри узла
-    struct Node *next;   // указатель на следующий узел
+    Sneaker      data;   // данные внутри узла (не указатель)
+    struct Node *next;
 } Node;
 ```
 
-### 2. Функции
+### Функции
 
-- `CreateNode()` — создаёт узел со случайными осмысленными данными (`malloc`, `rand`)
-- `PushBack(Node **head)` — добавляет узел в конец списка: проходит до последнего узла и присваивает `cur->next`
-- `PrintList(Node *head)` — выводит весь список в виде таблицы (бренд, модель, размер, цена)
-- `FreeList(Node *head)` — освобождает всю память списка
+- `CreateNode()` — `malloc` + случайные brand/model/size/price
+- `PushBack(&head)` — добавляет узел в конец списка
+- `PrintList(head)` — выводит таблицу
+- `FreeList(head)` — очищает память
 
-### 3. Создание списка из N элементов
-
-N можно задать двумя способами:
+### `n` через `argv[1]`
 
 ```bash
-./sneakers 10        # через аргумент main
-./sneakers           # ввод с клавиатуры
+./sneakers 10    # 10 узлов
+./sneakers       # ввод через scanf
 ```
 
-## Сборка и запуск
+## Сборка
 
 ```bash
-gcc -Wall main.c -o sneakers
-./sneakers 10
+gcc -Wall main.c -o sneakers && ./sneakers 10
 ```

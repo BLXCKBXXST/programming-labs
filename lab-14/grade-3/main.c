@@ -13,19 +13,16 @@ typedef struct {
 
 // ---- узел односвязного списка ----
 typedef struct Node {
-    Sneaker      data;
+    Sneaker      data;   // данные внутри узла (не указатель)
     struct Node *next;
 } Node;
 
-// создаём новый узел со случайными данными
 Node *CreateNode(void) {
     char *brands[] = {"Nike", "Adidas", "Puma"};
     char *models[] = {"Pro", "Super", "Ultra"};
     int   prices[] = {200, 250, 300, 350, 400, 450, 500};
-
     Node *node = malloc(sizeof(Node));
-    int b = rand() % 3;
-    int m = rand() % 3;
+    int b = rand() % 3, m = rand() % 3;
     strcpy(node->data.brand, brands[b]);
     strcpy(node->data.model, models[m]);
     node->data.size  = 36 + rand() % 9;
@@ -34,19 +31,14 @@ Node *CreateNode(void) {
     return node;
 }
 
-// добавление узла в конец списка
 void PushBack(Node **head) {
     Node *node = CreateNode();
-    if (*head == NULL) {
-        *head = node;
-        return;
-    }
+    if (*head == NULL) { *head = node; return; }
     Node *cur = *head;
     while (cur->next) cur = cur->next;
     cur->next = node;
 }
 
-// вывод списка
 void PrintList(Node *head) {
     printf("\n%-5s %-10s %-10s %-8s %s\n",
            "№", "Бренд", "Модель", "Размер", "Цена");
@@ -61,29 +53,18 @@ void PrintList(Node *head) {
 }
 
 void FreeList(Node *head) {
-    while (head) {
-        Node *tmp = head;
-        head = head->next;
-        free(tmp);
-    }
+    while (head) { Node *tmp = head; head = head->next; free(tmp); }
 }
 
 int main(int argc, char *argv[]) {
     int n;
-    if (argc > 1) {
-        n = atoi(argv[1]);
-    } else {
-        printf("Введите количество элементов n: ");
-        scanf("%d", &n);
-    }
-
+    if (argc > 1) n = atoi(argv[1]);
+    else { printf("Введите n: "); scanf("%d", &n); }
     srand(time(NULL));
     Node *head = NULL;
     for (int i = 0; i < n; i++) PushBack(&head);
-
     printf("Односвязный список (%d элементов):", n);
     PrintList(head);
-
     FreeList(head);
     return 0;
 }
