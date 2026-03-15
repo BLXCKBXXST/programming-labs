@@ -2,16 +2,11 @@
 
 ## Что реализовано
 
-Включает всё из оценки 3, плюс:
+Включает всё из оценки 3, плюс CMakeLists.txt.
 
-### 5–6. CMakeLists.txt
-
-CMake-файл описывает сборку библиотеки `sneakers` и исполняемого `sneakers_app`.
+### CMakeLists.txt
 
 ```cmake
-cmake_minimum_required(VERSION 3.10)
-project(sneakers_lab13 C)
-set(CMAKE_C_STANDARD 99)
 set(LIB_TYPE "STATIC" CACHE STRING "Library type: STATIC or SHARED")
 add_library(sneakers ${LIB_TYPE} src/sneakers.c)
 target_include_directories(sneakers PUBLIC include)
@@ -19,7 +14,7 @@ add_executable(sneakers_app src/main.c)
 target_link_libraries(sneakers_app PRIVATE sneakers)
 ```
 
-### 7. Выбор типа библиотеки через `-D`
+### Выбор типа библиотеки через `-DLIB_TYPE`
 
 ```bash
 # статическая библиотека (по умолчанию)
@@ -29,17 +24,12 @@ cmake -B build -DLIB_TYPE=STATIC
 cmake -B build -DLIB_TYPE=SHARED
 ```
 
-### 8. `-DCMAKE_BUILD_TYPE`
+### `-DCMAKE_BUILD_TYPE`
 
 | Значение | Что делает |
 |---|---|
-| `Debug` | без оптимизации (`-O0`), с отладочной информацией (`-g`) |
-| `Release` | с оптимизацией (`-O2`/`-O3`), без отладочной информации |
-
-```bash
-cmake -B build -DCMAKE_BUILD_TYPE=Debug
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-```
+| `Debug` | `-O0 -g` — без оптимизации, с отладочными символами |
+| `Release` | `-O2`/`-O3` — оптимизированная сборка |
 
 ## Сборка и запуск
 
