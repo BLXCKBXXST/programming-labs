@@ -1,4 +1,39 @@
-# Lab 13 sneakers — Grade 3
+# Lab 13 — sneakers — Оценка 3
+
+## Что реализовано
+
+### 1. Структура папок
+
+Код из лабы 12 разбит по каталогам:
+
+```
+grade-3/
+├── src/
+│   ├── main.c       — только main()
+│   └── sneakers.c   — реализации функций
+├── include/
+│   └── sneakers.h   — тип Sneaker, объявления функций
+└── Makefile
+```
+
+### 2–4. Makefile с целями `all` и `clean`
+
+Makefile автоматизирует сборку статической библиотеки и линковку. Обязательные цели:
+
+```makefile
+all    # полная сборка проекта
+clean  # удаление .o, .a и исполняемого файла
+```
+
+Цепочка сборки:
+1. `src/sneakers.c` скомпилируется в `src/sneakers.o`
+2. из `sneakers.o` собирается `libsneakers.a` (статическая библиотека)
+3. `src/main.c` линкуется с `libsneakers.a` → исполняемый файл `sneakers`
+
+## Сборка и запуск
+
 ```bash
-gcc -Wall main.c -o sneakers && ./sneakers
+make        # собрать проект (цель all)
+./sneakers  # запустить
+make clean  # удалить все промежуточные файлы
 ```
