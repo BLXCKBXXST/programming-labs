@@ -1,17 +1,21 @@
+# минимальная версия cmake которая нужна для сборки проекта
 cmake_minimum_required(VERSION 3.10)
+
+# название проекта и язык программирования
 project(cmake_task C)
 
+# говорим cmake что пишем на c99
 set(CMAKE_C_STANDARD 99)
 
-# Добавляем подпапку pipes — CMake зайдёт в неё и выполнит её CMakeLists.txt
+# подключаем папку pipes - cmake сам зайдёт туда и выполнит её CMakeLists.txt
 add_subdirectory(pipes)
 
-# Добавляем подпапку background — внутри она сама подцепится к pipes
+# аналогично добавляем background, она внутри сама знает про pipes
 add_subdirectory(background)
 
-# Создаём исполняемый файл из src/main.c
+# создаём исполняемый файл из main.c
 add_executable(cmake_task src/main.c)
 
-# Линкуем исполняемый файл с библиотекой background
-# (background сама потянет pipes автоматически)
+# линкуем с background, pipes подцепится автоматически потому что мы объявили его PUBLIC в pipes/CMakeLists.txt
+# PRIVATE значит что background нужен только внутри этой цели, наружу не уходит
 target_link_libraries(cmake_task PRIVATE background)
