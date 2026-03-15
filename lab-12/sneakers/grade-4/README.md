@@ -2,33 +2,28 @@
 
 ## Что реализовано
 
-Включает всё из оценки 3, плюс:
-
-### 8. Разбивка на 3 файла
+### Структура папок
 
 ```
-include/sneakers.h  — заголовочный: тип Sneaker, объявления функций
-src/sneakers.c     — исходный: реализации FillSneakers, BubbleSortByPrice, PrintSneakers
-src/main.c         — исходный: только main()
+grade-4/
+├── src/
+│   ├── main.c       — только main(): заполнить, сортировать, вывести
+│   └── sneakers.c   — реализация: FillSneakers, BubbleSortByPrice, PrintSneakers
+├── include/
+│   └── sneakers.h   — struct Sneaker, #define N 100, объявления функций
+└── Makefile
 ```
 
-### 9. Статическая библиотека `.a`
+### Makefile: цели `all` и `clean`, статическая библиотека
 
-Статическая библиотека — это архив скомпилированных объектных файлов (`.o`).
-При линковке код библиотеки вставляется прямо в исполняемый файл.
+Цепочка сборки:
 
-### 10. Линковка и запуск
+1. `src/sneakers.c` → `src/sneakers.o`
+2. `src/sneakers.o` → `libsneakers.a` (статическая библиотека)
+3. `src/main.c` + `libsneakers.a` → `sneakers` (исполняемый файл)
 
 ```bash
-# 1. компиляция sneakers.c в объектный файл
-gcc -Wall -Iinclude -c src/sneakers.c -o sneakers.o
-
-# 2. сборка статической библиотеки
-ar rcs libsneakers.a sneakers.o
-
-# 3. линковка main.c с библиотекой и запуск
-gcc -Wall -Iinclude src/main.c libsneakers.a -o sneakers
+make        # цель all
 ./sneakers
+make clean  # удаляет .o, .a, sneakers
 ```
-
-> `ar rcs` — утилита архивации. `r` — добавить/заменить файл, `c` — создать архив, `s` — индекс символов.
