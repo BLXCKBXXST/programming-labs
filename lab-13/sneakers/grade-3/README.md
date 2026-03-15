@@ -2,38 +2,26 @@
 
 ## Что реализовано
 
-### 1. Структура папок
-
-Код из лабы 12 разбит по каталогам:
+### Структура папок
 
 ```
 grade-3/
 ├── src/
-│   ├── main.c       — только main()
-│   └── sneakers.c   — реализации функций
+│   ├── main.c        — только main()
+│   └── sneakers.c    — FillSneakers, BubbleSortByPrice, PrintSneakers
 ├── include/
-│   └── sneakers.h   — тип Sneaker, объявления функций
+│   └── sneakers.h    — struct Sneaker, #define N, объявления
 └── Makefile
 ```
 
-### 2–4. Makefile с целями `all` и `clean`
+### Makefile: цепочка сборки
 
-Makefile автоматизирует сборку статической библиотеки и линковку. Обязательные цели:
-
-```makefile
-all    # полная сборка проекта
-clean  # удаление .o, .a и исполняемого файла
-```
-
-Цепочка сборки:
-1. `src/sneakers.c` скомпилируется в `src/sneakers.o`
-2. из `sneakers.o` собирается `libsneakers.a` (статическая библиотека)
-3. `src/main.c` линкуется с `libsneakers.a` → исполняемый файл `sneakers`
-
-## Сборка и запуск
+1. `src/sneakers.c` → `src/sneakers.o`
+2. `src/sneakers.o` → `libsneakers.a` (статическая библиотека)
+3. `src/main.c` + `libsneakers.a` → `sneakers`
 
 ```bash
-make        # собрать проект (цель all)
-./sneakers  # запустить
-make clean  # удалить все промежуточные файлы
+make        # цель all
+./sneakers
+make clean  # удаляет .o, .a, sneakers
 ```
