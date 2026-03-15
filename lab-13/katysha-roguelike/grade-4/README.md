@@ -6,8 +6,6 @@
 
 ### 5–6. CMakeLists.txt
 
-CMake-файл описывает сборку библиотеки `room` и исполняемого `rooms`.
-
 ```cmake
 cmake_minimum_required(VERSION 3.10)
 project(roguelike_lab13 C)
