@@ -1,40 +1,56 @@
-# Lab 13 — sneakers — Оценка 4
+# Оценка 4 — CMakeLists.txt
 
-## Что реализовано
+## Что такое CMake?
 
-Включает всё из оценки 3, плюс CMakeLists.txt.
+CMake — это **генератор Makefile-ов**.  
+Ты пишешь один `CMakeLists.txt`, а CMake сам создаёт нужные Makefile под твою систему.  
+Полезно когда проект большой или нужно собирать на Windows/Linux/Mac.
 
-### CMakeLists.txt
+## Структура
 
-```cmake
-set(LIB_TYPE "STATIC" CACHE STRING "Library type: STATIC or SHARED")
-add_library(sneakers ${LIB_TYPE} src/sneakers.c)
-target_include_directories(sneakers PUBLIC include)
-add_executable(sneakers_app src/main.c)
-target_link_libraries(sneakers_app PRIVATE sneakers)
+```
+grade-4/
+├── CMakeLists.txt    # с्крипт сборки для CMake
+├── include/
+│   └── sneakers.h
+└── src/
+    ├── main.c
+    └── sneakers.c
 ```
 
-### Выбор типа библиотеки через `-DLIB_TYPE`
+## Как собрать
 
 ```bash
-# статическая библиотека (по умолчанию)
-cmake -B build -DLIB_TYPE=STATIC
+# шаг 1: создаём папку для всех генерируемых файлов (cmake не мусорит в исходниках)
+mkdir build && cd build
 
-# динамическая библиотека
-cmake -B build -DLIB_TYPE=SHARED
+# шаг 2: конфигурируем проект (читает CMakeLists.txt, генерирует Makefile)
+cmake ..
+
+# шаг 3: собираем
+make
+
+# запуск
+./sneakers_app
 ```
 
-### `-DCMAKE_BUILD_TYPE`
+## Сборка с динамической библиотекой
+
+```bash
+mkdir build && cd build
+cmake .. -DLIB_TYPE=SHARED   # передаём опцию через -D
+make
+```
+
+## Что значит -DCMAKE_BUILD_TYPE?
+
+Если спросят на экзамене, отвечаешь так:
 
 | Значение | Что делает |
 |---|---|
-| `Debug` | `-O0 -g` — без оптимизации, с отладочными символами |
-| `Release` | `-O2`/`-O3` — оптимизированная сборка |
-
-## Сборка и запуск
+| `Debug` | Включает отладочную информацию, отключает оптимизации. Используешь при разработке. |
+| `Release` | Оптимизирует код для скорости. Используешь когда всё готово и нужна скорость. |
 
 ```bash
-cmake -B build -DLIB_TYPE=STATIC -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-./build/sneakers_app
+cmake .. -DCMAKE_BUILD_TYPE=Release
 ```

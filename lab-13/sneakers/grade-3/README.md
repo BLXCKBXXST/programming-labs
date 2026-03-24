@@ -1,27 +1,58 @@
-# Lab 13 — sneakers — Оценка 3
+# Оценка 3 — Makefile + статическая библиотека
 
-## Что реализовано
-
-### Структура папок
+## Структура проекта
 
 ```
 grade-3/
-├── src/
-│   ├── main.c        — только main()
-│   └── sneakers.c    — FillSneakers, BubbleSortByPrice, PrintSneakers
+├── Makefile          # сценарий сборки
 ├── include/
-│   └── sneakers.h    — struct Sneaker, #define N, объявления
-└── Makefile
+│   └── sneakers.h    # заголовочный файл
+└── src/
+    ├── main.c        # только main()
+    └── sneakers.c    # реализация функций
 ```
 
-### Makefile: цепочка сборки
+## Что такое Makefile и зачем он нужен?
 
-1. `src/sneakers.c` → `src/sneakers.o`
-2. `src/sneakers.o` → `libsneakers.a` (статическая библиотека)
-3. `src/main.c` + `libsneakers.a` → `sneakers`
+Без Makefile нужно каждый раз вручную писать длинные команды:  
+```bash
+gcc -Wall -I include -c src/sneakers.c -o src/sneakers.o
+ar rcs libsneakers.a src/sneakers.o
+gcc -Wall -I include src/main.c libsneakers.a -o sneakers
+```
+С Makefile достаточно написать **`make`** — и всё выполнится автоматически.
+
+## Как работает Makefile
+
+Makefile состоит из **целей** (правил). Формат каждой цели:
+
+```
+цель: зависимости
+<TAB> команда
+```
+
+> ⚠УЧТИ: перед командой обязательно **TAB** (не пробелы!), иначе make выдаст ошибку.
+
+## Магические переменные
+
+| Переменная | Что означает |
+|---|---|
+| `$@` | цель (.то, что слева от `:`) |
+| `$<` | первая зависимость |
+| `$^` | все зависимости списком |
+
+## Как собрать и запустить
 
 ```bash
-make        # цель all
-./sneakers
-make clean  # удаляет .o, .a, sneakers
+make          # собрать всё
+./sneakers    # запустить
+make clean    # удалить скомпилированные файлы
+```
+
+## Что создаёт make
+
+```
+gcc -Wall -I include -c src/sneakers.c -o src/sneakers.o   ← объектный файл
+ar rcs libsneakers.a src/sneakers.o                        ← статическая библиотека
+gcc -Wall -I include src/main.c libsneakers.a -o sneakers   ← исполняемый файл
 ```
