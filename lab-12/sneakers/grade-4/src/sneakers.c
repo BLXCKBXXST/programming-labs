@@ -2,31 +2,49 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "sneakers.h"
+#include "../include/sneakers.h"
 
-void FillSneakers(Sneaker sneakers[N]) {
-    char *brands[] = {"Nike", "Adidas", "Puma"};
-    char *models[] = {"Pro", "Super", "Ultra"};
-    int base_prices[3][3] = {{200,350,500},{250,400,600},{300,450,700}};
+// Заполняем массив случайными кроссовками
+void FillSneakers(Sneaker arr[N]) {
+    char *brands[] = {"Nike", "Adidas", "Puma", "Reebok"};
+    char *models[] = {"Air Max", "Ultraboost", "Classic", "Suede"};
+
     srand(time(NULL));
+
     for (int i = 0; i < N; i++) {
-        int b = rand()%3, m = rand()%3;
-        strcpy(sneakers[i].brand, brands[b]);
-        strcpy(sneakers[i].model, models[m]);
-        sneakers[i].size  = 36 + rand()%9;
-        sneakers[i].price = base_prices[b][m];
+        int b = rand() % 4;
+        int m = rand() % 4;
+        strcpy(arr[i].brand, brands[b]);
+        strcpy(arr[i].model, models[m]);
+        arr[i].size  = 36 + rand() % 9;
+        arr[i].price = 50 + rand() % 451;
     }
 }
-void BubbleSortByPrice(Sneaker sneakers[N]) {
-    for (int i = 0; i < N-1; i++)
-        for (int j = 0; j < N-1-i; j++)
-            if (sneakers[j].price > sneakers[j+1].price) {
-                Sneaker tmp = sneakers[j]; sneakers[j] = sneakers[j+1]; sneakers[j+1] = tmp;
+
+// Сортировка пузырьком по полю price
+void BubbleSortByPrice(Sneaker arr[N]) {
+    for (int i = 0; i < N - 1; i++) {
+        for (int j = 0; j < N - 1 - i; j++) {
+            if (arr[j].price > arr[j + 1].price) {
+                Sneaker tmp = arr[j];
+                arr[j]     = arr[j + 1];
+                arr[j + 1] = tmp;
             }
+        }
+    }
 }
-void PrintSneakers(Sneaker sneakers[N]) {
-    printf("\n%-5s %-10s %-10s %-8s %s\n","№","Бренд","Модель","Размер","Цена");
-    printf("─────────────────────────────────────────────\n");
-    for (int i = 0; i < N; i++)
-        printf("%-5d %-10s %-10s %-8d $%d\n",i+1,sneakers[i].brand,sneakers[i].model,sneakers[i].size,sneakers[i].price);
+
+// Вывод массива в виде таблицы
+void PrintSneakers(Sneaker arr[N]) {
+    printf("\n%-4s %-10s %-12s %-8s %s\n",
+           "№", "Бренд", "Модель", "Размер", "Цена");
+    printf("-------------------------------------------\n");
+    for (int i = 0; i < N; i++) {
+        printf("%-4d %-10s %-12s %-8d $%d\n",
+               i + 1,
+               arr[i].brand,
+               arr[i].model,
+               arr[i].size,
+               arr[i].price);
+    }
 }

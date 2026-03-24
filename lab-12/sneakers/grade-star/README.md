@@ -1,38 +1,53 @@
-# Lab 12 — sneakers — Оценка «звёздочка»
+# Звёздочка — callback-функция сравнения
 
-## Что реализовано
+## Что такое callback?
 
-### BubbleSort через указатель на функцию-компаратор (callback)
+Callback (колбэк) — это когда мы **передаём функцию как аргумент** в другую функцию.
 
-`BubbleSortCallback` принимает пользовательскую функцию сравнения — так один алгоритм сортирует по любому полю.
+Вместо того чтобы писать отдельную `SortByPrice`, `SortBySize`, `SortByBrand`...  
+Мы пишем **одну** `BubbleSortCallback`, которая не знает *как* сравнивать —  
+она спрашивает об этом у переданной функции.
+
+## Как это выглядит в коде
 
 ```c
-void BubbleSortCallback(Sneaker *s, int n,
-                        int(*cmp)(const Sneaker*, const Sneaker*));
-
-// компараторы:
-int CompareByPrice(const Sneaker *a, const Sneaker *b) { return a->price - b->price; }
-int CompareBySize (const Sneaker *a, const Sneaker *b) { return a->size  - b->size;  }
+// функция сортировки принимает третий аргумент — указатель на функцию сравнения
+void BubbleSortCallback(Sneaker *arr, int n,
+                        int (*cmp)(const Sneaker *, const Sneaker *));
 ```
 
-### Бенчмарк `gettimeofday`
+Читаем `int (*cmp)(const Sneaker *, const Sneaker *)` как:  
+«`cmp` — это указатель на функцию, которая принимает два кроссовка и возвращает int»
 
-Измеряет время выполнения сортировки для N = 100, 10 000, 100 000. Показывает квадратичный рост времени O(n²).
+## Функции-компараторы
 
-### Структура папок
+```c
+// возвращает >0 если a дороже b — значит поставить b раньше
+int CompareByPrice(const Sneaker *a, const Sneaker *b) {
+    return a->price - b->price;
+}
 
+// возвращает >0 если размер a больше b
+int CompareBySize(const Sneaker *a, const Sneaker *b) {
+    return a->size - b->size;
+}
 ```
-grade-star/
-├── src/
-│   ├── main.c       — benchmark + демо сортировки
-│   └── sneakers.c   — FillSneakersN, BubbleSortCallback, PrintSneakersN
-└── include/
-    └── sneakers.h   — Sneaker struct, объявления функций
+
+## Как вызываем
+
+```c
+// сортируем по цене
+BubbleSortCallback(arr, 10, CompareByPrice);
+
+// сортируем по размеру — меняем только одно слово!
+BubbleSortCallback(arr, 10, CompareBySize);
 ```
 
-## Сборка и запуск
+Это удобно: сортировка одна, а логика сравнения — снаружи.
+
+## Сборка
 
 ```bash
-gcc -Wall -Iinclude src/main.c src/sneakers.c -o sneakers_star
-./sneakers_star
+gcc src/main.c src/sneakers.c -I include -o sneakers
+./sneakers
 ```
