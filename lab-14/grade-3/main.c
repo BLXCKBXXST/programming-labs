@@ -4,45 +4,46 @@
 #include <time.h>    /* time */
 
 /* -------------------------------------------------------
-   Структура "комната" (как требует задание)
+   Структура данных — кроссовок
    ------------------------------------------------------- */
-struct room {
-    char name[50];   /* имя комнаты          */
-    int  level;      /* уровень сложности    */
-    int  number;     /* номер комнаты        */
-    int  resolution; /* размер комнаты       */
-};
+typedef struct {
+    char brand[20];  /* бренд   */
+    char model[20];  /* модель  */
+    int  size;       /* размер  */
+    int  price;      /* цена    */
+} Sneaker;
 
 /* -------------------------------------------------------
    Узел односвязного списка.
    next — указатель на следующий узел (NULL если конец).
    ------------------------------------------------------- */
-struct Node {
-    struct room  data; /* данные узла (не указатель, а сама структура) */
+typedef struct Node {
+    Sneaker      data; /* данные узла (сама структура, не указатель) */
     struct Node *next; /* ссылка на следующий узел */
-};
+} Node;
 
 /* Создаёт один новый узел со случайными данными */
-struct Node *CreateNode(void) {
-    /* массивы строк для случайных имён */
-    char *names[] = {"Пещера", "Замок", "Лес", "Болото", "Руины"};
+Node *CreateNode(void) {
+    char *brands[] = {"Nike", "Adidas", "Puma"};
+    char *models[] = {"Pro", "Super", "Ultra"};
+    int   prices[] = {200, 250, 300, 350, 400, 450, 500};
 
     /* выделяем память под узел */
-    struct Node *node = malloc(sizeof(struct Node));
+    Node *node = malloc(sizeof(Node));
 
     /* заполняем случайными данными */
-    strcpy(node->data.name,  names[rand() % 5]);
-    node->data.level      = rand() % 10 + 1;  /* от 1 до 10 */
-    node->data.number     = rand() % 100 + 1; /* от 1 до 100 */
-    node->data.resolution = rand() % 5  + 1;  /* от 1 до 5  */
+    strcpy(node->data.brand, brands[rand() % 3]);
+    strcpy(node->data.model, models[rand() % 3]);
+    node->data.size  = 36 + rand() % 9;  /* от 36 до 44 */
+    node->data.price = prices[rand() % 7];
 
     node->next = NULL; /* у нового узла нет следующего */
     return node;
 }
 
 /* Добавляет новый узел в конец списка */
-void PushBack(struct Node **head) {
-    struct Node *node = CreateNode();
+void PushBack(Node **head) {
+    Node *node = CreateNode();
 
     /* если список пустой — новый узел становится головой */
     if (*head == NULL) {
@@ -51,7 +52,7 @@ void PushBack(struct Node **head) {
     }
 
     /* иначе идём до самого конца и цепляем туда */
-    struct Node *cur = *head;
+    Node *cur = *head;
     while (cur->next != NULL) {
         cur = cur->next;
     }
@@ -59,30 +60,30 @@ void PushBack(struct Node **head) {
 }
 
 /* Печатает весь список на экран */
-void PrintList(struct Node *head) {
-    printf("\n%-5s %-15s %-8s %-8s %s\n",
-           "№", "Название", "Уровень", "Номер", "Размер");
-    printf("----------------------------------------------\n");
+void PrintList(Node *head) {
+    printf("\n%-5s %-10s %-10s %-8s %s\n",
+           "№", "Бренд", "Модель", "Размер", "Цена");
+    printf("─────────────────────────────────────────────\n");
 
     int i = 1; /* счётчик для нумерации строк */
     while (head != NULL) {
-        printf("%-5d %-15s %-8d %-8d %d\n",
+        printf("%-5d %-10s %-10s %-8d $%d\n",
                i,
-               head->data.name,
-               head->data.level,
-               head->data.number,
-               head->data.resolution);
+               head->data.brand,
+               head->data.model,
+               head->data.size,
+               head->data.price);
         i++;
         head = head->next; /* переходим к следующему узлу */
     }
 }
 
 /* Освобождает всю выделенную память */
-void FreeList(struct Node *head) {
+void FreeList(Node *head) {
     while (head != NULL) {
-        struct Node *tmp = head;   /* запоминаем текущий */
-        head = head->next;         /* двигаемся вперёд   */
-        free(tmp);                 /* удаляем старый     */
+        Node *tmp = head;   /* запоминаем текущий */
+        head = head->next;  /* двигаемся вперёд   */
+        free(tmp);          /* удаляем старый     */
     }
 }
 
@@ -100,7 +101,7 @@ int main(int argc, char *argv[]) {
     /* инициализируем генератор случайных чисел */
     srand(time(NULL));
 
-    struct Node *head = NULL; /* голова списка — пока пустая */
+    Node *head = NULL; /* голова списка — пока пустая */
 
     /* добавляем n узлов */
     int i = 0; /* объявляем отдельно — стиль C89 */

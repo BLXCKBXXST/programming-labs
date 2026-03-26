@@ -4,14 +4,14 @@
 #include <time.h>
 
 /* -------------------------------------------------------
-   Структура данных — комната
+   Структура данных — кроссовок
    ------------------------------------------------------- */
-struct room {
-    char name[50];
-    int  level;
-    int  number;
-    int  resolution;
-};
+typedef struct {
+    char brand[20];
+    char model[20];
+    int  size;
+    int  price;
+} Sneaker;
 
 /*
  * Схема структуры (Вариант 1):
@@ -24,28 +24,30 @@ struct room {
  * Если списки разной длины — cross у "лишних" узлов = NULL.
  */
 
-struct Node {
-    struct room *data;  /* указатель на данные                  */
+typedef struct Node {
+    Sneaker     *data;  /* указатель на данные                  */
     struct Node *next;  /* следующий в своём ряду               */
     struct Node *cross; /* вертикальная связь (верх ↔ низ)      */
     int          row;   /* 0 = верхний ряд, 1 = нижний ряд      */
-};
+} Node;
 
-/* Создаёт структуру room со случайными данными */
-struct room *CreateRoom(void) {
-    char *names[] = {"Пещера", "Замок", "Лес", "Болото", "Руины"};
-    struct room *r = malloc(sizeof(struct room));
-    strcpy(r->name,  names[rand() % 5]);
-    r->level      = rand() % 10 + 1;
-    r->number     = rand() % 100 + 1;
-    r->resolution = rand() % 5  + 1;
-    return r;
+/* Создаёт структуру Sneaker со случайными данными */
+Sneaker *CreateSneaker(void) {
+    char *brands[] = {"Nike", "Adidas", "Puma"};
+    char *models[] = {"Pro", "Super", "Ultra"};
+    int   prices[] = {200, 250, 300, 350, 400, 450, 500};
+    Sneaker *s = malloc(sizeof(Sneaker));
+    strcpy(s->brand, brands[rand() % 3]);
+    strcpy(s->model, models[rand() % 3]);
+    s->size  = 36 + rand() % 9;
+    s->price = prices[rand() % 7];
+    return s;
 }
 
 /* Создаёт узел для указанного ряда (0 или 1) */
-struct Node *CreateNode(int row) {
-    struct Node *node = malloc(sizeof(struct Node));
-    node->data  = CreateRoom();
+Node *CreateNode(int row) {
+    Node *node  = malloc(sizeof(Node));
+    node->data  = CreateSneaker();
     node->next  = NULL;
     node->cross = NULL; /* сначала без вертикальных связей */
     node->row   = row;
@@ -53,13 +55,13 @@ struct Node *CreateNode(int row) {
 }
 
 /* Печатает один узел с указанием ряда */
-void PrintNode(struct Node *node) {
-    printf("[%s] %-15s уровень: %-3d номер: %-4d размер: %d\n",
+void PrintNode(Node *node) {
+    printf("[%s] %-10s %-10s размер: %-4d цена: $%d\n",
            node->row == 0 ? "верх" : "низ ",
-           node->data->name,
-           node->data->level,
-           node->data->number,
-           node->data->resolution);
+           node->data->brand,
+           node->data->model,
+           node->data->size,
+           node->data->price);
 }
 
 int main(int argc, char *argv[]) {
@@ -79,11 +81,11 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
 
     /* --- строим верхний ряд (next → вправо) --- */
-    struct Node *S       = NULL; /* S — начало, как требует задание */
-    struct Node *topTail = NULL;
+    Node *S       = NULL; /* S — начало, как требует задание */
+    Node *topTail = NULL;
     int i = 0;
     for (i = 0; i < N; i++) {
-        struct Node *node = CreateNode(0);
+        Node *node = CreateNode(0);
         if (S == NULL) {
             S = node;
             topTail = node;
@@ -94,10 +96,10 @@ int main(int argc, char *argv[]) {
     }
 
     /* --- строим нижний ряд (next → влево, т.е. добавляем в начало) --- */
-    struct Node *botHead = NULL; /* левый край нижнего ряда */
-    struct Node *botTail = NULL; /* правый край — под верхним [1] */
+    Node *botHead = NULL; /* левый край нижнего ряда */
+    Node *botTail = NULL; /* правый край — под верхним [1] */
     for (i = 0; i < K; i++) {
-        struct Node *node = CreateNode(1);
+        Node *node = CreateNode(1);
         /* добавляем в начало, чтобы обход next шёл влево */
         node->next = botHead;
         botHead = node;
@@ -110,8 +112,8 @@ int main(int argc, char *argv[]) {
      * Сохраняем нижний ряд в массив (слева направо),
      * чтобы удобно расставить вертикальные связи cross.
      */
-    struct Node **bot = malloc(K * sizeof(struct Node *));
-    struct Node *cur  = botTail;
+    Node **bot = malloc(K * sizeof(Node *));
+    Node *cur  = botTail;
     for (i = K - 1; i >= 0; i--) {
         bot[i] = cur;
         cur    = cur->next;
@@ -123,14 +125,13 @@ int main(int argc, char *argv[]) {
      * Где длинный выходит за короткий — cross = NULL (пункт 7).
      */
     int minLen = (N < K) ? N : K; /* минимум из двух длин */
-    struct Node *t = S;
+    Node *t = S;
     for (i = 0; i < minLen; i++) {
         t->cross      = bot[i]; /* верхний → нижний */
         bot[i]->cross = t;      /* нижний → верхний */
         t = t->next;
     }
-    /* у "лишних" узлов верхнего ряда cross уже NULL (из CreateNode) */
-    /* у "лишних" узлов нижнего ряда тоже */
+    /* у "лишних" узлов cross уже NULL из CreateNode */
     free(bot); /* массив вспомогательный, освобождаем */
 
     /* --- навигация --- */
@@ -178,7 +179,7 @@ int main(int argc, char *argv[]) {
                 if (cur == S) {
                     printf("Начало списка (S). Назад нельзя.\n");
                 } else {
-                    struct Node *p = S;
+                    Node *p = S;
                     while (p->next != NULL && p->next != cur) {
                         p = p->next;
                     }
@@ -230,16 +231,16 @@ int main(int argc, char *argv[]) {
     }
 
     /* освобождаем память обоих рядов */
-    struct Node *p = S;
+    Node *p = S;
     while (p != NULL) {
-        struct Node *nx = p->next;
+        Node *nx = p->next;
         free(p->data);
         free(p);
         p = nx;
     }
     p = botHead;
     while (p != NULL) {
-        struct Node *nx = p->next;
+        Node *nx = p->next;
         free(p->data);
         free(p);
         p = nx;

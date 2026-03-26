@@ -4,14 +4,14 @@
 #include <time.h>
 
 /* -------------------------------------------------------
-   Структура данных — комната
+   Структура данных — кроссовок
    ------------------------------------------------------- */
-struct room {
-    char name[50];
-    int  level;
-    int  number;
-    int  resolution;
-};
+typedef struct {
+    char brand[20];
+    char model[20];
+    int  size;
+    int  price;
+} Sneaker;
 
 /* -------------------------------------------------------
    Узел двусвязного списка.
@@ -19,35 +19,37 @@ struct room {
    next  — вперёд по списку
    prev  — назад по списку
    ------------------------------------------------------- */
-struct Node {
-    struct room *data; /* указатель на структуру (пункт 4 задания) */
+typedef struct Node {
+    Sneaker     *data; /* указатель на структуру (пункт 4 задания) */
     struct Node *next;
     struct Node *prev;
-};
+} Node;
 
-/* Создаёт структуру room, заполненную случайными данными */
-struct room *CreateRoom(void) {
-    char *names[] = {"Пещера", "Замок", "Лес", "Болото", "Руины"};
-    struct room *r = malloc(sizeof(struct room));
-    strcpy(r->name,  names[rand() % 5]);
-    r->level      = rand() % 10 + 1;
-    r->number     = rand() % 100 + 1;
-    r->resolution = rand() % 5  + 1;
-    return r;
+/* Создаёт структуру Sneaker, заполненную случайными данными */
+Sneaker *CreateSneaker(void) {
+    char *brands[] = {"Nike", "Adidas", "Puma"};
+    char *models[] = {"Pro", "Super", "Ultra"};
+    int   prices[] = {200, 250, 300, 350, 400, 450, 500};
+    Sneaker *s = malloc(sizeof(Sneaker));
+    strcpy(s->brand, brands[rand() % 3]);
+    strcpy(s->model, models[rand() % 3]);
+    s->size  = 36 + rand() % 9;
+    s->price = prices[rand() % 7];
+    return s;
 }
 
 /* Создаёт узел и инициализирует указатель data */
-struct Node *CreateNode(void) {
-    struct Node *node = malloc(sizeof(struct Node));
-    node->data = CreateRoom(); /* пункт 4: инициализируем указатель на структуру */
+Node *CreateNode(void) {
+    Node *node = malloc(sizeof(Node));
+    node->data = CreateSneaker(); /* пункт 4: инициализируем указатель на структуру */
     node->next = NULL;
     node->prev = NULL;
     return node;
 }
 
 /* Добавляет узел в конец двусвязного списка */
-void PushBack(struct Node **head, struct Node **tail) {
-    struct Node *node = CreateNode();
+void PushBack(Node **head, Node **tail) {
+    Node *node = CreateNode();
 
     if (*head == NULL) {
         /* список пустой — узел и голова и хвост */
@@ -63,22 +65,22 @@ void PushBack(struct Node **head, struct Node **tail) {
 }
 
 /* Печатает информацию об одном узле */
-void PrintNode(struct Node *node, int idx) {
-    printf("[%d] %-15s уровень: %-3d номер: %-4d размер: %d\n",
+void PrintNode(Node *node, int idx) {
+    printf("[%d] %-10s %-10s размер: %-4d цена: $%d\n",
            idx,
-           node->data->name,
-           node->data->level,
-           node->data->number,
-           node->data->resolution);
+           node->data->brand,
+           node->data->model,
+           node->data->size,
+           node->data->price);
 }
 
 /* Освобождает всю память списка */
-void FreeList(struct Node *head) {
+void FreeList(Node *head) {
     while (head != NULL) {
-        struct Node *tmp = head;
+        Node *tmp = head;
         head = head->next;
-        free(tmp->data); /* сначала освобождаем структуру room */
-        free(tmp);       /* потом сам узел                     */
+        free(tmp->data); /* сначала освобождаем структуру Sneaker */
+        free(tmp);       /* потом сам узел                        */
     }
 }
 
@@ -95,8 +97,8 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
 
     /* S — указатель на начало списка (как требует задание) */
-    struct Node *S    = NULL;
-    struct Node *tail = NULL;
+    Node *S    = NULL;
+    Node *tail = NULL;
 
     int i = 0;
     for (i = 0; i < n; i++) {
@@ -104,10 +106,10 @@ int main(int argc, char *argv[]) {
     }
 
     /* навигация по двусвязному списку */
-    struct Node *cur = S; /* текущая позиция — начало */
-    int idx = 1;
-    int running = 1;
-    char ch;
+    Node *cur   = S; /* текущая позиция — начало */
+    int   idx     = 1;
+    int   running = 1;
+    char  ch;
 
     printf("\nНавигация: D/6 — вперёд, A/4 — назад, Q — выход\n");
     printf("Начинаем с S (начало списка):\n");
