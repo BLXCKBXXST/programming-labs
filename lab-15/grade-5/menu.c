@@ -3,11 +3,6 @@
 #include "menu.h"
 #include "record.h"
 
-/*
- * load_and_run — определяет тип файла по расширению, загружает записи
- * в массив и запускает интерактивное меню.
- * Возвращает: 0 при успехе, -1 при ошибке.
- */
 int load_and_run(const char *filename) {
     const char *ext = strrchr(filename, '.');
     if (!ext) {
