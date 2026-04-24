@@ -8,9 +8,9 @@
 grade-5/
 ├── include/
 │   └── list.h       # заголовочный файл: структуры + объявления функций
-├── src/
-│   ├── main.c       # построение структуры и навигация
-│   └── list.c       # реализация CreateSneaker, CreateNode, PrintNode
+└── src/
+    ├── main.c       # только main() и навигация по списку
+    └── list.c       # реализация CreateSneaker, CreateNode, PrintNode
 ```
 
 ## Схема структуры
