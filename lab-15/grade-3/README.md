@@ -17,8 +17,9 @@
 
 ```
 grade-3/
-├── main.c       # чтение CSV и вывод таблицы
-├── staff.csv    # входные данные
+├── main.c          # чтение CSV через fgets/strtok, вывод таблицы
+├── main_syscall.c  # то же самое через open/read/write/close (★)
+├── staff.csv       # входные данные
 ├── Makefile
 └── README.md
 ```
@@ -33,8 +34,16 @@ Jeff Bezos;5002;Level_B
 ## Сборка и запуск
 
 ```bash
-make
+make              # собирает оба бинарника
 ./program staff.csv
+./program_syscall staff.csv
+```
+
+Отдельная сборка:
+
+```bash
+make program          # только стандартная версия
+make program_syscall  # только версия с syscall
 ```
 
 ## Пример вывода
@@ -48,3 +57,16 @@ make
 2     Jeff Bezos               5002     Level_B
 ...
 ```
+
+## ★ Вариант с системными вызовами (`main_syscall.c`)
+
+Задание «под звёздочкой»: перепиcать без функций стандартной библиотеки ввода-вывода.
+
+| Стандартная библиотека | Системный вызов |
+|---|---|
+| `fopen()` | `open()` |
+| `fgets()` | `read()` побайтово + ручной поиск `\n` |
+| `fprintf()` / `printf()` | `write()` в `STDOUT_FILENO` / `STDERR_FILENO` |
+| `fclose()` | `close()` |
+
+Поведение и формат вывода идентичны `program`.
