@@ -20,8 +20,9 @@ typedef enum {
 int  load_csv(const char *filename, Employee *employees, int max);
 int  load_dat(const char *filename, Employee *employees, int max);
 void print_table(const Employee *employees, int count);
-int  save_database(const Employee *employees, int count);
-void search_by_id(const Employee *employees, int count);
 void print_all(const Employee *employees, int count);
+int  save_database(const Employee *employees, int count);
+int  save_csv(const Employee *employees, int count, const char *filename);
+void search_by_id(const Employee *employees, int count);
 
 #endif

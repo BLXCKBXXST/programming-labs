@@ -44,11 +44,25 @@ void print_table(const Employee *employees, int count) {
         printf("%-5d %-24s %-8d %-10s\n", i+1, employees[i].name, employees[i].id, employees[i].level);
 }
 
+void print_all(const Employee *employees, int count) {
+    printf("\nСотрудников: %d\n\n", count);
+    print_table(employees, count);
+}
+
 int save_database(const Employee *employees, int count) {
     FILE *f = fopen(DATABASE_FILE, "wb");
     if (!f) { fprintf(stderr, "Ошибка: не удалось создать '%s'\n", DATABASE_FILE); return -1; }
     fwrite(&count, sizeof(int), 1, f);
     fwrite(employees, sizeof(Employee), count, f);
+    fclose(f);
+    return 0;
+}
+
+int save_csv(const Employee *employees, int count, const char *filename) {
+    FILE *f = fopen(filename, "w");
+    if (!f) { fprintf(stderr, "Ошибка: не удалось создать '%s'\n", filename); return -1; }
+    for (int i = 0; i < count; i++)
+        fprintf(f, "%s;%d;%s\n", employees[i].name, employees[i].id, employees[i].level);
     fclose(f);
     return 0;
 }
@@ -64,9 +78,4 @@ void search_by_id(const Employee *employees, int count) {
         }
     }
     fprintf(stderr, "Сотрудник с ID %d не найден\n", id);
-}
-
-void print_all(const Employee *employees, int count) {
-    printf("\nСотрудников: %d\n\n", count);
-    print_table(employees, count);
 }

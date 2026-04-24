@@ -8,9 +8,9 @@ void run_menu(Employee *employees, int count, SourceType src) {
         printf("\n=== Меню ===\n");
         printf("1. Поиск сотрудника по ID\n");
         printf("2. Показать всех сотрудников\n");
-        if (src == SRC_CSV || src == SRC_RLE) printf("3. Сохранить в %s\n", DATABASE_FILE);
+        if (src == SRC_CSV || src == SRC_RLE) printf("3. Сохранить в database.dat\n");
         if (src == SRC_DAT || src == SRC_RLE) printf("4. Сохранить в CSV\n");
-        if (src == SRC_DAT || src == SRC_CSV) printf("5. Сжать в RLE (%s)\n", RLE_FILE);
+        if (src == SRC_CSV || src == SRC_DAT) printf("5. Сжать в RLE (database.rle)\n");
         printf("0. Выход\n");
         printf("Выбор: ");
         if (scanf("%d", &choice) != 1) break;
@@ -19,7 +19,8 @@ void run_menu(Employee *employees, int count, SourceType src) {
             case 2: print_all(employees, count); break;
             case 3:
                 if (src == SRC_CSV || src == SRC_RLE) {
-                    if (save_database(employees, count) == 0) printf("Сохранено: '%s'\n", DATABASE_FILE);
+                    if (save_database(employees, count) == 0)
+                        printf("Сохранено: '%s'\n", DATABASE_FILE);
                 } else printf("Неверный выбор\n");
                 break;
             case 4:
@@ -31,7 +32,7 @@ void run_menu(Employee *employees, int count, SourceType src) {
                 } else printf("Неверный выбор\n");
                 break;
             case 5:
-                if (src == SRC_DAT || src == SRC_CSV) {
+                if (src == SRC_CSV || src == SRC_DAT) {
                     if (src == SRC_CSV) save_database(employees, count);
                     if (compress() == 0) printf("Сжато: '%s'\n", RLE_FILE);
                 } else printf("Неверный выбор\n");
