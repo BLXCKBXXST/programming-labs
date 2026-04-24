@@ -12,9 +12,16 @@ typedef struct {
     char level[MAX_LEVEL];
 } Employee;
 
+typedef enum {
+    SRC_CSV,
+    SRC_DAT
+} SourceType;
+
 int  load_csv(const char *filename, Employee *employees, int max);
+int  load_dat(const char *filename, Employee *employees, int max);
 void print_table(const Employee *employees, int count);
 int  save_database(const Employee *employees, int count);
-void search_by_id(void);
+void search_by_id(const Employee *employees, int count);
+void print_all(const Employee *employees, int count);
 
 #endif

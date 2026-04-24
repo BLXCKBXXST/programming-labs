@@ -2,36 +2,42 @@
 #include "menu.h"
 #include "employee.h"
 
-void run_menu(Employee *employees, int count) {
-    (void)employees;
-    (void)count;
-
+void run_menu(Employee *employees, int count, SourceType src) {
     int choice;
     do {
         printf("\n=== Меню ===\n");
         printf("1. Поиск сотрудника по ID\n");
-        printf("2. Сжать базу данных (RLE)\n");
-        printf("3. Восстановить базу данных из RLE\n");
+        printf("2. Показать всех сотрудников\n");
+        if (src == SRC_CSV || src == SRC_RLE) printf("3. Сохранить в %s\n", DATABASE_FILE);
+        if (src == SRC_DAT || src == SRC_RLE) printf("4. Сохранить в CSV\n");
+        if (src == SRC_DAT || src == SRC_CSV) printf("5. Сжать в RLE (%s)\n", RLE_FILE);
         printf("0. Выход\n");
         printf("Выбор: ");
-
         if (scanf("%d", &choice) != 1) break;
-
         switch (choice) {
-            case 1:
-                search_by_id();
-                break;
-            case 2:
-                compress();
-                break;
+            case 1: search_by_id(employees, count); break;
+            case 2: print_all(employees, count); break;
             case 3:
-                decompress();
+                if (src == SRC_CSV || src == SRC_RLE) {
+                    if (save_database(employees, count) == 0) printf("Сохранено: '%s'\n", DATABASE_FILE);
+                } else printf("Неверный выбор\n");
                 break;
-            case 0:
-                printf("До свидания!\n");
+            case 4:
+                if (src == SRC_DAT || src == SRC_RLE) {
+                    char name[128];
+                    printf("Имя CSV-файла: ");
+                    if (scanf("%127s", name) == 1 && save_csv(employees, count, name) == 0)
+                        printf("Сохранено: '%s'\n", name);
+                } else printf("Неверный выбор\n");
                 break;
-            default:
-                printf("Неверный выбор\n");
+            case 5:
+                if (src == SRC_DAT || src == SRC_CSV) {
+                    if (src == SRC_CSV) save_database(employees, count);
+                    if (compress() == 0) printf("Сжато: '%s'\n", RLE_FILE);
+                } else printf("Неверный выбор\n");
+                break;
+            case 0: printf("До свидания!\n"); break;
+            default: printf("Неверный выбор\n");
         }
     } while (choice != 0);
 }
