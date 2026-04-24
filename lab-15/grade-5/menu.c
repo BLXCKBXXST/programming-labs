@@ -1,7 +1,50 @@
 #include <stdio.h>
+#include <string.h>
 #include "menu.h"
 #include "record.h"
 
+/*
+ * load_and_run — определяет тип файла по расширению, загружает записи
+ * в массив и запускает интерактивное меню.
+ * Возвращает: 0 при успехе, -1 при ошибке.
+ */
+int load_and_run(const char *filename) {
+    const char *ext = strrchr(filename, '.');
+    if (!ext) {
+        fprintf(stderr, "Ошибка: неизвестный тип файла\n");
+        return -1;
+    }
+
+    Record records[MAX_RECORDS];
+    int count = 0;
+    SourceType src;
+
+    if (strcmp(ext, ".csv") == 0) {
+        src = SRC_CSV;
+        count = load_csv(filename, records, MAX_RECORDS);
+    } else if (strcmp(ext, ".dat") == 0) {
+        src = SRC_DAT;
+        count = load_dat(filename, records, MAX_RECORDS);
+    } else if (strcmp(ext, ".rle") == 0) {
+        src = SRC_RLE;
+        if (decompress() != 0) return -1;
+        count = load_dat(RESTORED_FILE, records, MAX_RECORDS);
+    } else {
+        fprintf(stderr, "Ошибка: неподдерживаемый формат '%s'\n", ext);
+        return -1;
+    }
+
+    if (count < 0) return -1;
+
+    printf("Загружено записей: %d\n", count);
+    run_menu(records, count, src);
+    return 0;
+}
+
+/*
+ * run_menu — интерактивное меню. Пункты формируются динамически
+ * в зависимости от типа загруженного файла.
+ */
 void run_menu(Record *records, int count, SourceType src) {
     int choice;
     do {
