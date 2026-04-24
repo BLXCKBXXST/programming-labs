@@ -1,9 +1,9 @@
 CC     = gcc
 CFLAGS = -Wall -Wextra -std=c11
 TARGET = program
-SRCS   = main.c employee.c menu.c
+SRCS   = main.c record.c menu.c
 
-$(TARGET): $(SRCS) employee.h menu.h
+$(TARGET): $(SRCS) record.h menu.h
 	$(CC) $(CFLAGS) $(SRCS) -o $(TARGET)
 
 clean:
