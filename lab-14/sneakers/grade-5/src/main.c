@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
     // --- строим нижний ряд (next → влево, т.е. добавляем в начало) ---
     Node *botHead = NULL; // левый край нижнего ряда
-    Node *botTail = NULL; // правый край — под верхним [1]
+    Node *botTail = NULL; // правый край — под верхним [N-1]
     for (i = 0; i < K; i++) {
         Node *node = CreateNode(1);
         // добавляем в начало, чтобы обход next шёл влево
@@ -48,11 +48,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // сохраняем нижний ряд в массив (слева направо),
-    // чтобы удобно расставить вертикальные связи cross
+    // сохраняем нижний ряд в массив (слева направо).
+    // botHead — левый край, next идёт влево (к botTail, у которого next=NULL).
+    // Поэтому итерируемся от botHead и заполняем bot[0..K-1] слева направо.
     Node **bot = malloc(K * sizeof(Node *));
-    Node *cur  = botTail;
-    for (i = K - 1; i >= 0; i--) {
+    Node *cur  = botHead;
+    for (i = 0; i < K; i++) {
         bot[i] = cur;
         cur    = cur->next;
     }
