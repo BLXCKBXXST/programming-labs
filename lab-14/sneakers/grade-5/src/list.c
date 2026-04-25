@@ -22,7 +22,8 @@ Node *CreateNode(int row) {
     Node *node  = malloc(sizeof(Node));
     node->data  = CreateSneaker();
     node->next  = NULL;
-    node->cross = NULL; // сначала без вертикальных связей
+    node->prev  = NULL;
+    node->cross = NULL;
     node->row   = row;
     return node;
 }

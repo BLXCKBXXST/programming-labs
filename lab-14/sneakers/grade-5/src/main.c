@@ -7,7 +7,6 @@
 int main(int argc, char *argv[]) {
     int N = 0, K = 0;
 
-    // N — длина верхнего ряда, K — длина нижнего
     if (argc > 2) {
         N = atoi(argv[1]);
         K = atoi(argv[2]);
@@ -20,54 +19,53 @@ int main(int argc, char *argv[]) {
 
     srand(time(NULL));
 
-    // --- строим верхний ряд (next → вправо) ---
-    Node *S       = NULL; // S — начало, как требует задание
+    // --- строим верхний ряд (next → вправо, prev → влево) ---
+    Node *S       = NULL;
     Node *topTail = NULL;
-    int i = 0;
-    for (i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++) {
         Node *node = CreateNode(0);
         if (S == NULL) {
             S = node;
             topTail = node;
         } else {
             topTail->next = node;
-            topTail = node;
+            node->prev    = topTail;
+            topTail       = node;
         }
     }
 
-    // --- строим нижний ряд (next → влево, т.е. добавляем в начало) ---
-    Node *botHead = NULL; // левый край нижнего ряда
-    Node *botTail = NULL; // правый край — под верхним [N-1]
-    for (i = 0; i < K; i++) {
-        Node *node = CreateNode(1);
-        // добавляем в начало, чтобы обход next шёл влево
-        node->next = botHead;
+    // --- строим нижний ряд
+    // next → влево (как по заданию: добавляем в начало)
+    // prev → вправо (новый узел становится правее старого) ---
+    Node *botHead = NULL; // левый край
+    Node *botTail = NULL; // правый край
+    for (int i = 0; i < K; i++) {
+        Node *node  = CreateNode(1);
+        node->next  = botHead;   // next → влево
+        if (botHead != NULL)
+            botHead->prev = node; // старый botHead.prev → вправо (на node)
         botHead = node;
-        if (botTail == NULL) {
-            botTail = node; // первый добавленный = правый край
-        }
+        if (botTail == NULL)
+            botTail = node;       // первый добавленный = правый край
     }
 
-    // сохраняем нижний ряд в массив (слева направо).
-    // botHead — левый край, next идёт влево (к botTail, у которого next=NULL).
-    // Поэтому итерируемся от botHead и заполняем bot[0..K-1] слева направо.
+    // заполняем bot[] через botHead (next → влево)
     Node **bot = malloc(K * sizeof(Node *));
     Node *cur  = botHead;
-    for (i = 0; i < K; i++) {
+    for (int i = 0; i < K; i++) {
         bot[i] = cur;
         cur    = cur->next;
     }
 
-    // расставляем cross: где ряды перекрываются — двусторонняя связь,
-    // где длинный выходит за короткий — cross = NULL (пункт 7)
+    // расставляем cross
     int minLen = (N < K) ? N : K;
     Node *t = S;
-    for (i = 0; i < minLen; i++) {
-        t->cross      = bot[i]; // верхний → нижний
-        bot[i]->cross = t;      // нижний → верхний
+    for (int i = 0; i < minLen; i++) {
+        t->cross      = bot[i];
+        bot[i]->cross = t;
         t = t->next;
     }
-    free(bot); // вспомогательный массив, освобождаем
+    free(bot);
 
     // --- навигация ---
     cur = S;
@@ -85,36 +83,32 @@ int main(int argc, char *argv[]) {
 
         if (ch == 'D' || ch == 'd' || ch == '6') {
             if (cur->row == 0) {
-                if (cur->next != NULL) { cur = cur->next; PrintNode(cur); }
+                // верхний ряд: вправо = next
+                if (cur->next) { cur = cur->next; PrintNode(cur); }
                 else printf("Конец верхнего ряда.\n");
             } else {
-                // нижний ряд: вправо = вверх → next → вниз
-                if (cur->cross != NULL && cur->cross->next != NULL
-                    && cur->cross->next->cross != NULL) {
-                    cur = cur->cross->next->cross;
-                    PrintNode(cur);
-                } else printf("Конец нижнего ряда.\n");
+                // нижний ряд: вправо = prev
+                if (cur->prev) { cur = cur->prev; PrintNode(cur); }
+                else printf("Правый край нижнего ряда.\n");
             }
         } else if (ch == 'A' || ch == 'a' || ch == '4') {
             if (cur->row == 0) {
-                if (cur == S) { printf("Начало списка (S). Назад нельзя.\n"); }
-                else {
-                    Node *p = S;
-                    while (p->next != NULL && p->next != cur) p = p->next;
-                    cur = p; PrintNode(cur);
-                }
+                // верхний ряд: влево = prev
+                if (cur->prev) { cur = cur->prev; PrintNode(cur); }
+                else printf("Начало списка (S). Назад нельзя.\n");
             } else {
-                if (cur->next != NULL) { cur = cur->next; PrintNode(cur); }
+                // нижний ряд: влево = next
+                if (cur->next) { cur = cur->next; PrintNode(cur); }
                 else printf("Левый край нижнего ряда.\n");
             }
         } else if (ch == 'S' || ch == 's' || ch == '2') {
             if (cur->row == 0) {
-                if (cur->cross != NULL) { cur = cur->cross; PrintNode(cur); }
+                if (cur->cross) { cur = cur->cross; PrintNode(cur); }
                 else printf("Переход вниз невозможен (cross = NULL).\n");
             } else printf("Уже в нижнем ряду.\n");
         } else if (ch == 'W' || ch == 'w' || ch == '8') {
             if (cur->row == 1) {
-                if (cur->cross != NULL) { cur = cur->cross; PrintNode(cur); }
+                if (cur->cross) { cur = cur->cross; PrintNode(cur); }
                 else printf("Переход вверх невозможен (cross = NULL).\n");
             } else printf("Уже в верхнем ряду.\n");
         } else if (ch == 'R' || ch == 'r') {
@@ -126,11 +120,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // освобождаем память обоих рядов
+    // освобождаем память
     Node *p = S;
-    while (p != NULL) { Node *nx = p->next; free(p->data); free(p); p = nx; }
+    while (p) { Node *nx = p->next; free(p->data); free(p); p = nx; }
     p = botHead;
-    while (p != NULL) { Node *nx = p->next; free(p->data); free(p); p = nx; }
+    while (p) { Node *nx = p->next; free(p->data); free(p); p = nx; }
 
     return 0;
 }
