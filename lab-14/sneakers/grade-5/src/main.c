@@ -18,51 +18,33 @@ int main(int argc, char *argv[]) {
 
     srand(time(NULL));
 
-    // --- верхний ряд: next → вправо, prev → влево ---
+    // --- верхний ряд: next → вправо ---
     Node *S       = NULL;
     Node *topTail = NULL;
     for (int i = 0; i < N; i++) {
         Node *node = CreateNode(0);
-        if (S == NULL) {
-            S = node;
-            topTail = node;
-        } else {
-            topTail->next = node;
-            node->prev    = topTail;
-            topTail       = node;
-        }
-    }
-
-    // --- нижний ряд: next → влево (добавляем в начало) ---
-    // botHead = левый край (next=NULL), botTail = правый край
-    Node *botHead = NULL;
-    Node *botTail = NULL;
-    for (int i = 0; i < K; i++) {
-        Node *node = CreateNode(1);
-        node->next = botHead;
-        botHead    = node;
-        if (botTail == NULL)
-            botTail = node; // первый добавленный = правый край
+        if (S == NULL) { S = node; topTail = node; }
+        else { topTail->next = node; topTail = node; }
     }
 
     /*
-     * Схема:
-     *  S → [top0] → [top1] → [top2] → NULL
-     *         |        |        |
-     *       [bot0] ← [bot1] ← [bot2] ← [bot3] ← [bot4] ← [bot5] → NULL
-     *
-     * top[i].cross должен вести к bot[i] — считая от ПРАВОГО края нижнего ряда.
-     * botTail = bot[0] (правый), его next = bot[1], и т.д.
-     * Заполняем bot[] начиная с botTail.
+     * Нижний ряд по заданию: next → влево.
+     * Нам нужно: bot[0] (под top[0]) был САМЫМ ПРАВЫМ узлом.
+     * Строим от правого узла к левому: i = K-1..0, каждый новый узел
+     * вставляется в начало (next → старый botHead).
+     * После петли: botHead = левый узел (next=NULL),
+     *                   bot[0] = правый узел (последний добавленный).
      */
     Node **bot = malloc(K * sizeof(Node *));
-    Node *cur  = botTail;
-    for (int i = 0; i < K; i++) {
-        bot[i] = cur;
-        cur    = cur->next; // next → влево
-    }
+    for (int i = 0; i < K; i++)
+        bot[i] = CreateNode(1);
+    // связываем: bot[0]→next=bot[1], bot[1]→next=bot[2], ..., bot[K-1]→next=NULL
+    for (int i = 0; i < K - 1; i++)
+        bot[i]->next = bot[i + 1];
+    // bot[K-1]→next = NULL ⑃⑃ (уже NULL после CreateNode)
+    Node *botHead = bot[K - 1]; // левый край (первый при обходе слева)
 
-    // расставляем cross: top[i] ↔ bot[i]
+    // cross: top[i] ↔ bot[i]
     int minLen = (N < K) ? N : K;
     Node *t = S;
     for (int i = 0; i < minLen; i++) {
@@ -73,9 +55,9 @@ int main(int argc, char *argv[]) {
     free(bot);
 
     // --- навигация ---
-    cur = S;
-    int  running = 1;
-    char ch;
+    Node *cur    = S;
+    int   running = 1;
+    char  ch;
     printf("\nНавигация:\n");
     printf("  D/6 — вправо,  A/4 — влево\n");
     printf("  S/2 — вниз (cross),  W/8 — вверх (cross)\n");
@@ -91,8 +73,7 @@ int main(int argc, char *argv[]) {
                 if (cur->next) { cur = cur->next; PrintNode(cur); }
                 else printf("Конец верхнего ряда.\n");
             } else {
-                // нижний: вправо = к botTail, т.е. обратно по next через cross
-                // используем cross соседа справа в верхнем ряду
+                // нижний: вправо = cross соседа справа по верхнему
                 if (cur->cross && cur->cross->next && cur->cross->next->cross) {
                     cur = cur->cross->next->cross; PrintNode(cur);
                 } else printf("Правый край нижнего ряда.\n");
