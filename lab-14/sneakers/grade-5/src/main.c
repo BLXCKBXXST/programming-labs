@@ -23,26 +23,21 @@ int main(int argc, char *argv[]) {
     Node *topTail = NULL;
     for (int i = 0; i < N; i++) {
         Node *node = CreateNode(0);
+        node->idx  = i;
         if (S == NULL) { S = node; topTail = node; }
-        else { topTail->next = node; topTail = node; }
+        else { topTail->next = node; node->prev = topTail; topTail = node; }
     }
 
-    /*
-     * Нижний ряд по заданию: next → влево.
-     * Нам нужно: bot[0] (под top[0]) был САМЫМ ПРАВЫМ узлом.
-     * Строим от правого узла к левому: i = K-1..0, каждый новый узел
-     * вставляется в начало (next → старый botHead).
-     * После петли: botHead = левый узел (next=NULL),
-     *                   bot[0] = правый узел (последний добавленный).
-     */
+    // --- нижний ряд: по схеме нет обратных ссылок (nil слева),
+    // next указывает вправо (bot[i]->next = bot[i+1]) ---
     Node **bot = malloc(K * sizeof(Node *));
-    for (int i = 0; i < K; i++)
-        bot[i] = CreateNode(1);
-    // связываем: bot[0]→next=bot[1], bot[1]→next=bot[2], ..., bot[K-1]→next=NULL
+    for (int i = 0; i < K; i++) {
+        bot[i]      = CreateNode(1);
+        bot[i]->idx = i;
+    }
     for (int i = 0; i < K - 1; i++)
         bot[i]->next = bot[i + 1];
-    // bot[K-1]→next = NULL ⑃⑃ (уже NULL после CreateNode)
-    Node *botHead = bot[K - 1]; // левый край (первый при обходе слева)
+    Node *botHead = bot[0]; // левый край (под top[0])
 
     // cross: top[i] ↔ bot[i]
     int minLen = (N < K) ? N : K;
@@ -58,7 +53,7 @@ int main(int argc, char *argv[]) {
     Node *cur    = S;
     int   running = 1;
     char  ch;
-    printf("\nНавигация:\n");
+    printf("\nНавигация (N=%d, K=%d):\n", N, K);
     printf("  D/6 — вправо,  A/4 — влево\n");
     printf("  S/2 — вниз (cross),  W/8 — вверх (cross)\n");
     printf("  R — к S,  Q — выход\n\n");
@@ -73,18 +68,15 @@ int main(int argc, char *argv[]) {
                 if (cur->next) { cur = cur->next; PrintNode(cur); }
                 else printf("Конец верхнего ряда.\n");
             } else {
-                // нижний: вправо = cross соседа справа по верхнему
-                if (cur->cross && cur->cross->next && cur->cross->next->cross) {
-                    cur = cur->cross->next->cross; PrintNode(cur);
-                } else printf("Правый край нижнего ряда.\n");
+                if (cur->next) { cur = cur->next; PrintNode(cur); }
+                else printf("Правый край нижнего ряда.\n");
             }
         } else if (ch == 'A' || ch == 'a' || ch == '4') {
             if (cur->row == 0) {
                 if (cur->prev) { cur = cur->prev; PrintNode(cur); }
                 else printf("Начало списка (S). Назад нельзя.\n");
             } else {
-                // нижний: влево = next
-                if (cur->next) { cur = cur->next; PrintNode(cur); }
+                if (cur->prev) { cur = cur->prev; PrintNode(cur); }
                 else printf("Левый край нижнего ряда.\n");
             }
         } else if (ch == 'S' || ch == 's' || ch == '2') {
@@ -109,6 +101,7 @@ int main(int argc, char *argv[]) {
     // освобождаем память
     Node *p = S;
     while (p) { Node *nx = p->next; free(p->data); free(p); p = nx; }
+    // нижний ряд: next → вправо, botHead = левый край
     p = botHead;
     while (p) { Node *nx = p->next; free(p->data); free(p); p = nx; }
 

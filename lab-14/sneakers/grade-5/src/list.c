@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include "../include/list.h"
 
-// Создаёт структуру Sneaker со случайными данными
 Sneaker *CreateSneaker(void) {
     char *brands[] = {"Nike", "Adidas", "Puma"};
     char *models[] = {"Pro", "Super", "Ultra"};
@@ -17,7 +15,6 @@ Sneaker *CreateSneaker(void) {
     return s;
 }
 
-// Создаёт узел для указанного ряда (0 или 1)
 Node *CreateNode(int row) {
     Node *node  = malloc(sizeof(Node));
     node->data  = CreateSneaker();
@@ -25,15 +22,19 @@ Node *CreateNode(int row) {
     node->prev  = NULL;
     node->cross = NULL;
     node->row   = row;
+    node->idx   = -1; // заполняется после построения цепи
     return node;
 }
 
-// Печатает один узел с указанием ряда
 void PrintNode(Node *node) {
-    printf("[%s] %-10s %-10s размер: %-4d цена: $%d\n",
+    // по схеме: top[i] = a_(N-2i), bot[i] = a_(N-1-2i)
+    // но поскольку N неизвестно здесь, просто показываем ряд и индекс
+    printf("[%s #%d] %-8s %-8s размер:%-3d цена:$%d  cross:%s\n",
            node->row == 0 ? "верх" : "низ ",
+           node->idx,
            node->data->brand,
            node->data->model,
            node->data->size,
-           node->data->price);
+           node->data->price,
+           node->cross ? "yes" : "nil");
 }

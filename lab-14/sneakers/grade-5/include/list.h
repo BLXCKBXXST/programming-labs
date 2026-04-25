@@ -1,7 +1,6 @@
 #ifndef LIST_H
 #define LIST_H
 
-// описание одной пары кроссовок
 typedef struct {
     char brand[20];
     char model[20];
@@ -10,26 +9,26 @@ typedef struct {
 } Sneaker;
 
 /*
- * Схема структуры (Вариант 1):
+ * Схема (Вариант 5):
  *
- *  S → [1] → [2] → [3] → ... → [N] → NULL   (верхний ряд, next → вправо)
- *       |      |     |
- *      [1] ← [2] ← [3] ← ... ← [K] → NULL  (нижний ряд, next → влево)
- *      [1] → [2] → [3] → ... → [K] → NULL  (нижний ряд, prev → вправо)
+ *  S → [top0:a_n] → [top1:a_n-2] → ... → [top(N-1):a_2] → NULL
+ *          |               |
+ *       [bot0:a_n-1] → [bot1:a_n-3] → ... → [bot(K-1):a_1] → NULL
+ *           nil ← левый поинтер, next → вправо
  *
- * cross — вертикальная связь между рядами.
- * prev  — предыдущий узел (для верхнего: влево; для нижнего: вправо).
- * Если списки разной длины — cross у лишних узлов = NULL (пункт 7).
+ * idx   — порядковый номер узла в своём ряду (0-базированный)
+ * cross — вертикальная связь между рядами
+ * Если N != K — cross у лишних узлов = NULL
  */
 typedef struct Node {
-    Sneaker     *data;  // указатель на данные
-    struct Node *next;  // вправо (верх) / влево (низ)
-    struct Node *prev;  // влево (верх) / вправо (низ)
-    struct Node *cross; // вертикальная связь (верх ↔ низ)
-    int          row;   // 0 = верхний ряд, 1 = нижний ряд
+    Sneaker     *data;
+    struct Node *next;  // вправо (верх) / вправо (низ)
+    struct Node *prev;  // влево  (верх) / NULL у левого края
+    struct Node *cross;
+    int          row;   // 0 = верх, 1 = низ
+    int          idx;   // позиция в ряду (0-базированная)
 } Node;
 
-// объявления функций (реализация в list.c)
 Sneaker *CreateSneaker(void);
 Node    *CreateNode(int row);
 void     PrintNode(Node *node);
