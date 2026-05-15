@@ -38,6 +38,17 @@ lab-11/task-2/after
 lab-11/task-3/after
 lab-11/task-4/after
 
+lab-15-2/src/task1
+lab-15-2/src/task2
+lab-15-2/src/task3
+lab-15-2/src/task4
+lab-15-2/src/task5
+lab-15-2/src/task_star
+
+lab-17/grade-3/test_simple
+lab-17/grade-4/test_cmocka
+# lab-17/grade-5/test_full собирается через CMake → попадает в build/, уже игнорится
+
 # Системное
 .DS_Store
 Thumbs.db
