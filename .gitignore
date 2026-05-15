@@ -1,0 +1,43 @@
+# Скомпилированные бинарники
+*.o
+*.a
+*.so
+*.exe
+*.out
+
+# Папки сборки
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# Конкретные бинарники из лаб (без расширений)
+lab-00/task0/hello
+lab-00/task1/output
+lab-00/task2/overflow
+lab-00/task3/chars
+lab-00/task4/after
+
+lab-01/grade-3/leap
+lab-01/grade-4/temperature
+lab-01/grade-5/area
+
+lab-02/alg08_factorial
+lab-02/alg09_maxdigit
+lab-02/alg10_reverse
+lab-02/alg11_log2
+lab-02/alg12_digitsum
+
+lab-02-2/grade-4/square
+lab-02-2/grade-5/stairs
+lab-02-2/grade-star/spiral
+
+lab-11/task-1/after
+lab-11/task-2/after
+lab-11/task-3/after
+lab-11/task-4/after
+
+# Системное
+.DS_Store
+Thumbs.db
