@@ -45,6 +45,20 @@ lab-15-2/src/task4
 lab-15-2/src/task5
 lab-15-2/src/task_star
 
+lab-16/grade-3/ex1_create
+lab-16/grade-3/ex2_join
+lab-16/grade-3/ex3_args
+lab-16/grade-3/ex4_cancel
+lab-16/grade-3/ex5_cleanup
+lab-16/grade-3/ex6_sleepsort
+lab-16/grade-4/ex7_sync
+lab-16/grade-4/ex8_matmul
+lab-16/grade-4/ex9_benchmark
+lab-16/grade-5/chat
+lab-16/grade-star/din_phil
+lab-16/grade-star/din_phil_fixed
+# benchmark.csv остаётся (исходные данные), benchmark.png тоже (артефакт лабы)
+
 lab-17/grade-3/test_simple
 lab-17/grade-4/test_cmocka
 # lab-17/grade-5/test_full собирается через CMake → попадает в build/, уже игнорится
