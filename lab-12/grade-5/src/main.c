@@ -38,7 +38,7 @@ int main(void) {
     Sneaker arr[10];
     FillSneakersN(arr, 10);
 
-    printf("\nПример (10 кроссовок):")
+    printf("\nПример (10 кроссовок):");
     printf("\nДО сортировки:");
     PrintSneakersN(arr, 10);
 
