@@ -58,13 +58,22 @@ sudo apt install libcmocka-dev cmake
 
 Тремя способами — на выбор.
 
-### 1. Через CMake + ctest (рекомендуется, grade-5)
+### 1. Через корневой Makefile-диспетчер (рекомендуется)
+
+```bash
+make test               # cmake + build + ctest --output-on-failure
+make clean              # удалить build/ и бинарники grade-3/4
+```
+
+### 2. Напрямую через CMake + ctest
 
 ```bash
 cmake -B build -S .
 cmake --build build
 cd build && ctest --output-on-failure
 ```
+
+![Запуск ctest](ctest.png)
 
 Результат:
 
@@ -79,14 +88,14 @@ cd build && ctest --output-on-failure
 100% tests passed, 0 tests failed out of 3
 ```
 
-### 2. Запуск конкретной grade-папки через Makefile
+### 3. Запуск конкретной grade-папки через Makefile
 
 ```bash
 cd grade-3 && make run     # обычные assert
 cd grade-4 && make run     # CMocka
 ```
 
-### 3. Только конкретный тест в ctest
+### 4. Только конкретный тест в ctest
 
 ```bash
 cd build && ctest -R grade-5 --verbose
