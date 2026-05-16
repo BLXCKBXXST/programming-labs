@@ -1,6 +1,8 @@
-# Лабораторная работа №15
+# Лабораторная работа №15 — Работа с текстовыми и бинарными файлами
 
-**Тема:** Работа с текстовыми и бинарными файлами  
+![C](https://img.shields.io/badge/C-11-blue) ![Build](https://img.shields.io/badge/build-Makefile-orange) ![Topic](https://img.shields.io/badge/topic-files%20%2B%20RLE-yellow)
+
+> Чтение CSV, парсинг через `strtok`, сериализация в бинарный `.dat`, поиск по ключу через `fread`, RLE-сжатие. Дополнительно — вариант на чистых системных вызовах `open/read/write` без stdio.
 
 ## Предметная область
 
@@ -44,12 +46,23 @@ Elon Musk;5001;Level_A
 ## Сборка и запуск
 
 ```bash
-cd grade-N
-make
-./program <файл>
+make all              # собрать все grade (через диспетчер в корне)
+make grade-3
+make grade-5
+make clean
+
+# или вручную внутри подпапки:
+cd grade-N && make && ./program <файл>
 ```
 
 ## Тестовые файлы
 
-- `grade-5/staff.csv` — основная база сотрудников (15 записей)
+- `grade-3/staff.csv` — основная база сотрудников
 - `grade-5/staff2.csv` — дополнительный набор для тестирования парсера
+
+## 📸 Скриншоты
+
+| Что | Где |
+|---|---|
+| Таблица сотрудников после парсинга CSV (grade-3) | ![staff](grade-3/staff.png) |
+| Отчёт RLE-сжатия: исходный → сжатый размер (grade-5) | ![rle](grade-5/rle.png) |
