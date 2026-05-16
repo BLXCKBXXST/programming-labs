@@ -115,7 +115,8 @@ server #2 got: [Client 1] message 1
 --- main: done ---
 ```
 
-![Запуск chat](grade-5/chat.png)
+![Запуск chat — старт](grade-5/chat1.png)
+![Запуск chat — приём сообщений](grade-5/chat2.png)
 
 ---
 
