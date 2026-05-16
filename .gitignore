@@ -63,6 +63,33 @@ lab-17/grade-3/test_simple
 lab-17/grade-4/test_cmocka
 # lab-17/grade-5/test_full собирается через CMake → попадает в build/, уже игнорится
 
+# lab-10 / 12 / 13 / 14 / 15 — артефакты сборки
+lab-10/grade-3/fraction
+lab-10/grade-4/fraction
+lab-10/grade-5/fraction_dyn
+lab-10/grade-star/fraction
+lab-10/grade-star/*.o
+
+lab-12/grade-3/sneakers
+lab-12/grade-4/sneakers
+lab-12/grade-5/sneakers
+lab-12/grade-star/sneakers
+
+lab-13/grade-3/sneakers
+lab-13/grade-4/build/
+lab-13/grade-5/build/
+
+lab-14/grade-3/sneakers
+lab-14/grade-4/sneakers
+lab-14/grade-5/sneakers_list
+
+lab-15/grade-3/program
+lab-15/grade-3/program_syscall
+lab-15/grade-5/program
+lab-15/grade-5/database.dat
+lab-15/grade-5/database.rle
+lab-15/grade-5/database_restored.dat
+
 # Системное
 .DS_Store
 Thumbs.db

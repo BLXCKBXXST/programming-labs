@@ -115,6 +115,8 @@ server #2 got: [Client 1] message 1
 --- main: done ---
 ```
 
+![Запуск chat](grade-5/chat.png)
+
 ---
 
 ## ★ Обедающие философы
@@ -143,6 +145,10 @@ $ tail -2 /tmp/p.log
 Philosopher 3 is done eating.
 Philosopher 0 is done eating.
 ```
+
+Воспроизводимый дедлок исходной версии (зависает и не печатает финальные строки):
+
+![Deadlock](grade-star/deadlock.png)
 
 ---
 

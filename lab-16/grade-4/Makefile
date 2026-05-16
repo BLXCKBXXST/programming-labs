@@ -15,4 +15,10 @@ benchmark: ex9_benchmark
 	python3 benchmark.py
 
 clean:
-	rm -f $(BINS) benchmark.csv benchmark.png
+	rm -f $(BINS)
+	# benchmark.csv и benchmark.png — артефакты, остающиеся в репо;
+	# чтобы удалить и их, использовать `make distclean`.
+
+.PHONY: distclean
+distclean: clean
+	rm -f benchmark.csv benchmark.png
