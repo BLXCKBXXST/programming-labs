@@ -90,6 +90,28 @@ lab-15/grade-5/database.dat
 lab-15/grade-5/database.rle
 lab-15/grade-5/database_restored.dat
 
+# Если lab-15/grade-5/program запустить из корня lab-15, файлы создаются здесь
+lab-15/database.dat
+lab-15/database.rle
+lab-15/database_restored.dat
+
+# Python артефакты (benchmark.py в lab-16 + любые ноутбуки)
+__pycache__/
+*.pyc
+*.pyo
+
+# Редакторы и IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# core dumps (ASan / valgrind / SIGSEGV)
+core
+core.*
+vgcore.*
+
 # Системное
 .DS_Store
 Thumbs.db
