@@ -9,16 +9,13 @@
 
 using namespace tui;
 
-// ─────────────────────────────────────────────────────────────────────────────
 AtmEngine::AtmEngine(const std::string& data_dir)
-    : storage_(data_dir),
-      journal_path_(data_dir + "/journal.bin")
+    : storage_(data_dir), journal_path_(data_dir + "/journal.bin")
 {
     storage_.createDemoDataIfNeeded();
     journal_ = std::make_unique<Journal>(journal_path_);
 }
 
-// ── Хелперы ──────────────────────────────────────────────────────────────────
 static std::string fmtMoney(double v) {
     std::ostringstream s;
     s << std::fixed << std::setprecision(2) << v << " руб";
@@ -34,12 +31,11 @@ static std::string fmtTime(std::time_t t) {
     return buf;
 }
 
-// ── Шапка ────────────────────────────────────────────────────────────────────
 static void drawHeader(const std::string& subtitle = "") {
     clearScreen();
     boxTop();
-    boxRow(std::string(BOLD) + CYAN   + center("  BANK ATM v1.0  ", W) + RESET);
-    boxRow(std::string(DIM)  + WHITE  + center("ул. Советская, 1  Новосибирск", W) + RESET);
+    boxRow(std::string(BOLD) + CYAN + center("  BANK ATM v1.0  ", W) + RESET);
+    boxRow(std::string(DIM) + WHITE + center("ул. Советская, 1  Новосибирск", W) + RESET);
     if (!subtitle.empty()) {
         boxSep();
         boxRow(std::string(BOLD) + WHITE + center(subtitle, W) + RESET);
@@ -47,7 +43,6 @@ static void drawHeader(const std::string& subtitle = "") {
     boxSep();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 void AtmEngine::run() {
     while (true) {
         drawHeader();
@@ -56,7 +51,7 @@ void AtmEngine::run() {
         boxRow(std::string(DIM) + center("demo: 1234567890123456  PIN: 1234", W) + RESET);
         boxRow(std::string(DIM) + center("      9876543210987654  PIN: 5678", W) + RESET);
         boxEmpty();
-        boxRow(std::string(DIM) + center("exit — выход", W) + RESET);
+        boxRow(std::string(DIM) + center("exit - выход", W) + RESET);
         boxBot();
         showCursor();
 
@@ -73,18 +68,15 @@ void AtmEngine::run() {
 
         Card card;
         if (!storage_.loadCard(card_number, card)) {
-            showMsg("Карта не найдена: " + card_number, false);
-            continue;
+            showMsg("Карта не найдена: " + card_number, false); continue;
         }
         if (card.isBlocked()) {
-            showMsg("Карта ЗАБЛОКИРОВАНА\nОбратитесь в отделение банка", false);
-            continue;
+            showMsg("Карта ЗАБЛОКИРОВАНА\nОбратитесь в отделение банка", false); continue;
         }
 
         Account account;
         if (!storage_.loadAccount(card_number, account)) {
-            showMsg("Счёт не найден для карты " + card_number, false);
-            continue;
+            showMsg("Счёт не найден для карты " + card_number, false); continue;
         }
 
         Recovery::restore(account, *journal_, card_number);
@@ -101,7 +93,6 @@ void AtmEngine::run() {
     }
 }
 
-// ── PIN-экран ─────────────────────────────────────────────────────────────────
 bool AtmEngine::screenPin(Card& card) {
     for (int attempt = 1; attempt <= 3 && !card.isBlocked(); ++attempt) {
         drawHeader("Введите PIN-код");
@@ -112,13 +103,8 @@ bool AtmEngine::screenPin(Card& card) {
         boxRow(att.str());
         boxBot();
 
-        std::string pin = readPin(
-            std::string("  ") + YELLOW + "PIN -> " + RESET);
-
-        if (card.checkPin(pin)) {
-            card.resetAttempts();
-            return true;
-        }
+        std::string pin = readPin(std::string("  ") + YELLOW + "PIN -> " + RESET);
+        if (card.checkPin(pin)) { card.resetAttempts(); return true; }
         int left = card.addFailedAttempt();
         if (left == 0) return false;
         showMsg("Неверный PIN. Осталось попыток: " + std::to_string(left), false);
@@ -126,14 +112,12 @@ bool AtmEngine::screenPin(Card& card) {
     return false;
 }
 
-// ── Главное меню ──────────────────────────────────────────────────────────────
 void AtmEngine::screenMenu(Card& card, Account& account) {
     while (true) {
         drawHeader("Главное меню");
         boxRow(std::string("  Карта:  ") + CYAN + maskedCard(card.number()) + RESET);
         boxRow(std::string("  Баланс: ") + GREEN + BOLD + fmtMoney(account.balance()) + RESET);
         boxSep();
-
         int choice = simpleMenu({
             "Баланс",
             "Снять наличные",
@@ -141,7 +125,6 @@ void AtmEngine::screenMenu(Card& card, Account& account) {
             "История (последние 5)",
             "Завершить сессию"
         });
-
         switch (choice) {
             case 0: screenBalance(account);        break;
             case 1: screenWithdraw(card, account); break;
@@ -153,14 +136,12 @@ void AtmEngine::screenMenu(Card& card, Account& account) {
     }
 }
 
-// ── Баланс ────────────────────────────────────────────────────────────────────
 void AtmEngine::screenBalance(const Account& account) {
     drawHeader("Баланс счёта");
     boxEmpty();
-    boxRow(std::string("  Текущий баланс:"));
+    boxRow("  Текущий баланс:");
     boxRow(std::string("    ") + GREEN + BOLD + fmtMoney(account.balance()) + RESET);
     boxEmpty();
-
     char tbuf[32];
     std::time_t now = std::time(nullptr);
     std::strftime(tbuf, sizeof(tbuf), "%d.%m.%Y %H:%M:%S", std::localtime(&now));
@@ -168,20 +149,17 @@ void AtmEngine::screenBalance(const Account& account) {
     boxEmpty();
 
     Transaction t{};
-    t.type         = TransactionType::CHECK;
-    t.amount       = 0.0;
-    t.fee          = 0.0;
+    t.type = TransactionType::CHECK;
+    t.amount = 0.0; t.fee = 0.0;
     t.balance_after = account.balance();
-    t.timestamp    = now;
-    std::strncpy(t.card_number, account.cardNumber().c_str(),
-                 sizeof(t.card_number) - 1);
+    t.timestamp = now;
+    std::strncpy(t.card_number, account.cardNumber().c_str(), sizeof(t.card_number) - 1);
     journal_->append(t);
 
     boxBot();
-    pause();
+    tui::waitKey();
 }
 
-// ── Снятие ────────────────────────────────────────────────────────────────────
 void AtmEngine::screenWithdraw(Card& /*card*/, Account& account) {
     drawHeader("Снятие наличных");
     boxRow(std::string(DIM) + "  Лимит за раз: 10 000 руб" + RESET);
@@ -195,10 +173,8 @@ void AtmEngine::screenWithdraw(Card& /*card*/, Account& account) {
     std::cout << "  " << CYAN << "Сумма руб -> " << RESET;
     double amount = 0.0;
     if (!(std::cin >> amount)) {
-        std::cin.clear();
-        std::cin.ignore(10000, '\n');
-        showMsg("Неверный ввод", false);
-        return;
+        std::cin.clear(); std::cin.ignore(10000, '\n');
+        showMsg("Неверный ввод", false); return;
     }
     std::cin.ignore(10000, '\n');
 
@@ -210,7 +186,6 @@ void AtmEngine::screenWithdraw(Card& /*card*/, Account& account) {
     boxRow(std::string("  Комиссия:  ") + YELLOW + fmtMoney(fee) + RESET);
     boxRow(std::string("  Спишется:  ") + RED + BOLD + fmtMoney(total) + RESET);
     boxSep();
-
     int ok = simpleMenu({"Подтвердить", "Отмена"});
     if (ok != 0) { showMsg("Операция отменена", false); return; }
 
@@ -219,14 +194,12 @@ void AtmEngine::screenWithdraw(Card& /*card*/, Account& account) {
         auto txs = account.lastTransactions(1);
         if (!txs.empty()) journal_->append(txs.back());
         storage_.saveAccount(account);
-        showMsg("Выдано: " + fmtMoney(amount) +
-                "\nНовый баланс: " + fmtMoney(new_bal), true);
+        showMsg("Выдано: " + fmtMoney(amount) + "\nНовый баланс: " + fmtMoney(new_bal), true);
     } catch (const std::exception& e) {
         showMsg(e.what(), false);
     }
 }
 
-// ── Пополнение ────────────────────────────────────────────────────────────────
 void AtmEngine::screenDeposit(Card& /*card*/, Account& account) {
     drawHeader("Пополнение счёта");
     boxRow(std::string("  Баланс: ") + GREEN + BOLD + fmtMoney(account.balance()) + RESET);
@@ -236,10 +209,8 @@ void AtmEngine::screenDeposit(Card& /*card*/, Account& account) {
     std::cout << "  " << CYAN << "Сумма руб -> " << RESET;
     double amount = 0.0;
     if (!(std::cin >> amount)) {
-        std::cin.clear();
-        std::cin.ignore(10000, '\n');
-        showMsg("Неверный ввод", false);
-        return;
+        std::cin.clear(); std::cin.ignore(10000, '\n');
+        showMsg("Неверный ввод", false); return;
     }
     std::cin.ignore(10000, '\n');
 
@@ -248,14 +219,12 @@ void AtmEngine::screenDeposit(Card& /*card*/, Account& account) {
         auto txs = account.lastTransactions(1);
         if (!txs.empty()) journal_->append(txs.back());
         storage_.saveAccount(account);
-        showMsg("Зачислено: " + fmtMoney(amount) +
-                "\nБаланс: " + fmtMoney(new_bal), true);
+        showMsg("Зачислено: " + fmtMoney(amount) + "\nБаланс: " + fmtMoney(new_bal), true);
     } catch (const std::exception& e) {
         showMsg(e.what(), false);
     }
 }
 
-// ── История ───────────────────────────────────────────────────────────────────
 void AtmEngine::screenHistory(const Account& account) {
     drawHeader("История операций");
     auto txs = account.lastTransactions(5);
@@ -283,19 +252,16 @@ void AtmEngine::screenHistory(const Account& account) {
         }
     }
     boxBot();
-    pause();
+    tui::waitKey();
 }
 
-// ── Сообщение ─────────────────────────────────────────────────────────────────
 void AtmEngine::showMsg(const std::string& msg, bool ok) {
     drawHeader(ok ? "Успешно" : "Ошибка");
     std::istringstream ss(msg);
     std::string line;
-    while (std::getline(ss, line)) {
-        boxRow(std::string("  ") +
-               (ok ? GREEN : RED) + BOLD + line + RESET);
-    }
+    while (std::getline(ss, line))
+        boxRow(std::string("  ") + (ok ? GREEN : RED) + BOLD + line + RESET);
     boxEmpty();
     boxBot();
-    pause();
+    tui::waitKey();
 }
