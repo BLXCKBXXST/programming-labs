@@ -1,0 +1,18 @@
+{
+  "field": {
+    "cols": 25,
+    "rows": 25,
+    "cell_size": 22,
+    "description": "Размер игрового поля и размер клетки в пикселях"
+  },
+  "difficulty": {
+    "easy":   { "speed_ms": 120, "score_mult": 1, "description": "Лёгкий — медленно, x1 очко" },
+    "medium": { "speed_ms": 70,  "score_mult": 2, "description": "Средний — нормально, x2 очка" },
+    "hard":   { "speed_ms": 38,  "score_mult": 3, "description": "Сложный — быстро, x3 очка" }
+  },
+  "game": {
+    "food_score": 10,
+    "initial_length": 3,
+    "description": "Базовые параметры игры"
+  }
+}
