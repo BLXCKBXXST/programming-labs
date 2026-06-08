@@ -8,185 +8,165 @@
 #include <algorithm>
 #include <chrono>
 #include <thread>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
 
-#ifdef _WIN32
-  #include <conio.h>
-  #include <windows.h>
-  #define CLEAR "cls"
-  #define KEY_UP    72
-  #define KEY_DOWN  80
-  #define KEY_LEFT  75
-  #define KEY_RIGHT 77
-  #define KEY_ESC   27
-  #define KEY_SPACE 32
-  #define KEY_P     112
-  #define KEY_R     114
-  static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-  void gotoxy(int x, int y) {
-    COORD coord = {(SHORT)x, (SHORT)y};
-    SetConsoleCursorPosition(hConsole, coord);
-  }
-  void hideCursor() {
-    CONSOLE_CURSOR_INFO ci = {1, FALSE};
-    SetConsoleCursorInfo(hConsole, &ci);
-  }
-  int getKey() {
-    if (_kbhit()) {
-      int c = _getch();
-      if (c == 0 || c == 224) c = _getch();
-      return c;
+// ─── ANSI escape helpers ───────────────────────────────────────────
+#define CLR       "\033[2J\033[H"
+#define HOME      "\033[H"
+#define HIDE_CUR  "\033[?25l"
+#define SHOW_CUR  "\033[?25h"
+#define BOLD      "\033[1m"
+#define RESET     "\033[0m"
+#define GREEN     "\033[32m"
+#define YELLOW    "\033[33m"
+#define CYAN      "\033[36m"
+#define RED       "\033[31m"
+#define WHITE     "\033[37m"
+#define GRAY      "\033[90m"
+
+// ─── Неблокирующий ввод (POSIX) ───────────────────────────────────
+static struct termios orig_termios;
+
+void enableRawMode() {
+    tcgetattr(STDIN_FILENO, &orig_termios);
+    struct termios raw = orig_termios;
+    raw.c_lflag &= ~(ECHO | ICANON);
+    raw.c_cc[VMIN]  = 0;
+    raw.c_cc[VTIME] = 0;
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+}
+
+void disableRawMode() {
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+    printf(SHOW_CUR);
+}
+
+// Стрелки: UP=1001 DOWN=1002 LEFT=1003 RIGHT=1004
+int readKey() {
+    char c = 0;
+    if (read(STDIN_FILENO, &c, 1) != 1) return 0;
+    if (c == '\033') {
+        char seq[3] = {0};
+        read(STDIN_FILENO, &seq[0], 1);
+        read(STDIN_FILENO, &seq[1], 1);
+        if (seq[0] == '[') {
+            if (seq[1] == 'A') return 1001;
+            if (seq[1] == 'B') return 1002;
+            if (seq[1] == 'D') return 1003;
+            if (seq[1] == 'C') return 1004;
+        }
+        return 27;
     }
-    return 0;
-  }
-#else
-  #include <ncurses.h>
-  #define CLEAR "clear"
-  void hideCursor() { curs_set(0); }
-  int getKey() {
-    int c = getch();
-    return (c == ERR) ? 0 : c;
-  }
-#endif
+    return (unsigned char)c;
+}
 
-// ─────────────────────────────────────────────
-// СТРУКТУРЫ
-// ─────────────────────────────────────────────
+// ─── Структуры ────────────────────────────────────────────────────
 
 struct Config {
-    int  cols         = 20;
-    int  rows         = 20;
-    int  speed_easy   = 200;
-    int  speed_medium = 120;
-    int  speed_hard   = 60;
-    int  food_score   = 10;
-    int  init_length  = 3;
+    int cols         = 20;
+    int rows         = 20;
+    int speed_easy   = 200;
+    int speed_medium = 120;
+    int speed_hard   = 60;
+    int food_score   = 10;
+    int init_length  = 3;
 };
+
+Config loadConfig(const std::string& fn) {
+    Config c;
+    std::ifstream f(fn);
+    if (!f.is_open()) return c;
+    std::string key; int val;
+    while (f >> key >> val) {
+        if      (key == "cols")         c.cols         = val;
+        else if (key == "rows")         c.rows         = val;
+        else if (key == "speed_easy")   c.speed_easy   = val;
+        else if (key == "speed_medium") c.speed_medium = val;
+        else if (key == "speed_hard")   c.speed_hard   = val;
+        else if (key == "food_score")   c.food_score   = val;
+        else if (key == "init_length")  c.init_length  = val;
+    }
+    return c;
+}
 
 struct Point {
     int x, y;
-    bool operator==(const Point& o) const { return x == o.x && y == o.y; }
+    bool operator==(const Point& o) const { return x==o.x && y==o.y; }
 };
 
-enum Direction { UP, DOWN, LEFT, RIGHT };
-enum Difficulty { EASY, MEDIUM, HARD };
-enum GameState  { MENU, PLAYING, PAUSED, GAMEOVER };
-
-// ─────────────────────────────────────────────
-// ЗАГРУЗКА CONFIG
-// ─────────────────────────────────────────────
-
-Config loadConfig(const std::string& filename) {
-    Config cfg;
-    std::ifstream f(filename);
-    if (!f.is_open()) {
-        std::cerr << "[INFO] config.cfg not found, using defaults.\n";
-        return cfg;
-    }
-    std::string key;
-    int val;
-    while (f >> key >> val) {
-        if      (key == "cols")         cfg.cols         = val;
-        else if (key == "rows")         cfg.rows         = val;
-        else if (key == "speed_easy")   cfg.speed_easy   = val;
-        else if (key == "speed_medium") cfg.speed_medium = val;
-        else if (key == "speed_hard")   cfg.speed_hard   = val;
-        else if (key == "food_score")   cfg.food_score   = val;
-        else if (key == "init_length")  cfg.init_length  = val;
-    }
-    return cfg;
-}
-
-// ─────────────────────────────────────────────
-// РЕКОРДЫ
-// ─────────────────────────────────────────────
+enum Dir   { DUP, DDOWN, DLEFT, DRIGHT };
+enum Diff  { EASY, MEDIUM, HARD };
+enum State { MENU, PLAYING, PAUSED, GAMEOVER };
 
 struct Records {
-    int easy = 0, medium = 0, hard = 0;
-    const std::string file = "records.dat";
-
+    int v[3] = {0, 0, 0};
+    const char* file = "records.dat";
     void load() {
         std::ifstream f(file);
-        if (f.is_open()) f >> easy >> medium >> hard;
+        if (f.is_open()) f >> v[0] >> v[1] >> v[2];
     }
     void save() {
         std::ofstream f(file);
-        if (f.is_open()) f << easy << " " << medium << " " << hard;
+        if (f.is_open()) f << v[0] << " " << v[1] << " " << v[2];
     }
-    int get(Difficulty d) const {
-        if (d == EASY)   return easy;
-        if (d == MEDIUM) return medium;
-        return hard;
-    }
-    void update(Difficulty d, int score) {
-        if (d == EASY   && score > easy)   { easy   = score; save(); }
-        if (d == MEDIUM && score > medium) { medium = score; save(); }
-        if (d == HARD   && score > hard)   { hard   = score; save(); }
+    int  get(Diff d) const { return v[(int)d]; }
+    bool update(Diff d, int s) {
+        if (s > v[(int)d]) { v[(int)d]=s; save(); return true; }
+        return false;
     }
 };
 
-// ─────────────────────────────────────────────
-// ИГРОВОЕ ПОЛЕ
-// ─────────────────────────────────────────────
+// ─── Игра ─────────────────────────────────────────────────────────
 
-class Snake {
-public:
-    Config     cfg;
-    Records    rec;
-    Difficulty diff  = MEDIUM;
-    GameState  state = MENU;
-
+struct Game {
+    Config cfg;
+    Records rec;
+    Diff   diff  = MEDIUM;
+    State  state = MENU;
     std::deque<Point> body;
-    Direction  dir     = RIGHT;
-    Direction  nextDir = RIGHT;
-    Point      food    = {0, 0};
-    int        score   = 0;
-    bool       newRecord = false;
+    Dir    dir = DRIGHT, nextDir = DRIGHT;
+    Point  food = {0,0};
+    int    score = 0;
+    bool   newRec = false;
 
-    Snake(Config c) : cfg(c) { rec.load(); }
+    Game(Config c) : cfg(c) { rec.load(); }
 
-    void initGame() {
+    void init() {
         body.clear();
-        int mx = cfg.cols / 2, my = cfg.rows / 2;
+        int mx = cfg.cols/2, my = cfg.rows/2;
         for (int i = 0; i < cfg.init_length; i++)
-            body.push_back({mx - i, my});
-        dir = RIGHT; nextDir = RIGHT;
-        score = 0; newRecord = false;
-        placeFood();
-        state = PLAYING;
+            body.push_back({mx-i, my});
+        dir = DRIGHT; nextDir = DRIGHT;
+        score = 0; newRec = false;
+        placeFood(); state = PLAYING;
     }
 
     void placeFood() {
         std::vector<Point> free;
-        for (int x = 1; x < cfg.cols - 1; x++)
-            for (int y = 1; y < cfg.rows - 1; y++) {
-                Point p = {x, y};
-                if (std::find(body.begin(), body.end(), p) == body.end())
+        for (int x=1; x<cfg.cols-1; x++)
+            for (int y=1; y<cfg.rows-1; y++) {
+                Point p={x,y};
+                if (std::find(body.begin(),body.end(),p)==body.end())
                     free.push_back(p);
             }
-        if (!free.empty())
-            food = free[rand() % free.size()];
+        if (!free.empty()) food = free[rand()%free.size()];
     }
 
     bool step() {
         dir = nextDir;
-        Point head = body.front();
-        switch (dir) {
-            case UP:    head.y--; break;
-            case DOWN:  head.y++; break;
-            case LEFT:  head.x--; break;
-            case RIGHT: head.x++; break;
-        }
-        if (head.x <= 0 || head.x >= cfg.cols - 1 ||
-            head.y <= 0 || head.y >= cfg.rows - 1)
-            return false;
-        for (auto& s : body)
-            if (s == head) return false;
-
-        body.push_front(head);
-
-        if (head == food) {
-            int mult = (diff == EASY ? 1 : diff == MEDIUM ? 2 : 3);
-            score += cfg.food_score * mult;
+        Point h = body.front();
+        if (dir==DUP)    h.y--;
+        if (dir==DDOWN)  h.y++;
+        if (dir==DLEFT)  h.x--;
+        if (dir==DRIGHT) h.x++;
+        if (h.x<=0||h.x>=cfg.cols-1||h.y<=0||h.y>=cfg.rows-1) return false;
+        for (auto& s : body) if (s==h) return false;
+        body.push_front(h);
+        if (h==food) {
+            int m = (diff==EASY?1:diff==MEDIUM?2:3);
+            score += cfg.food_score * m;
             placeFood();
         } else {
             body.pop_back();
@@ -194,244 +174,163 @@ public:
         return true;
     }
 
-    int getSpeed() const {
-        if (diff == EASY)   return cfg.speed_easy;
-        if (diff == MEDIUM) return cfg.speed_medium;
+    int speed() const {
+        if (diff==EASY)   return cfg.speed_easy;
+        if (diff==MEDIUM) return cfg.speed_medium;
         return cfg.speed_hard;
     }
-
-    std::string diffName() const {
-        if (diff == EASY)   return "Легкий  ";
-        if (diff == MEDIUM) return "Средний ";
-        return "Сложный ";
+    const char* diffName() const {
+        if (diff==EASY)   return "Legkiy  ";
+        if (diff==MEDIUM) return "Sredniy ";
+        return "Slozhnyy";
     }
 };
 
-// ─────────────────────────────────────────────
-// ОТРИСОВКА
-// ─────────────────────────────────────────────
+// ─── Отрисовка ────────────────────────────────────────────────────
 
-#ifdef _WIN32
-void draw(const Snake& g) {
-    gotoxy(0, 0);
+void drawGame(const Game& g) {
+    printf(HOME);
     const int W = g.cfg.cols, H = g.cfg.rows;
-    std::string hud = " Счёт: " + std::to_string(g.score)
-                    + "  Рекорд: " + std::to_string(g.rec.get(g.diff))
-                    + "  Длина: " + std::to_string((int)g.body.size())
-                    + "  [" + g.diffName() + "]    ";
-    std::cout << hud << "\n";
+
+    // HUD
+    printf(BOLD WHITE " Score: %-6d  Record: %-6d  Len: %-4d  [%s]" RESET "     \n",
+           g.score, g.rec.get(g.diff), (int)g.body.size(), g.diffName());
+
     for (int y = 0; y < H; y++) {
+        printf(" ");
         for (int x = 0; x < W; x++) {
-            Point p = {x, y};
-            if (y == 0 || y == H-1)
-                std::cout << (x == 0 || x == W-1 ? '+' : '-');
-            else if (x == 0 || x == W-1)
-                std::cout << '|';
-            else if (p == g.body.front())
-                std::cout << '@';
-            else if (std::find(g.body.begin()+1, g.body.end(), p) != g.body.end())
-                std::cout << 'o';
-            else if (p == g.food)
-                std::cout << '*';
-            else
-                std::cout << ' ';
+            Point p = {x,y};
+            if (y==0||y==H-1) {
+                printf(CYAN "%c" RESET, (x==0||x==W-1)?'+':'-');
+            } else if (x==0||x==W-1) {
+                printf(CYAN "|" RESET);
+            } else if (p==g.body.front()) {
+                printf(BOLD GREEN "@" RESET);
+            } else if (std::find(g.body.begin()+1,g.body.end(),p)!=g.body.end()) {
+                printf(GREEN "o" RESET);
+            } else if (p==g.food) {
+                printf(BOLD YELLOW "*" RESET);
+            } else {
+                printf(" ");
+            }
         }
-        std::cout << "\n";
+        printf("\n");
     }
-    if (g.state == PAUSED)
-        std::cout << "\n  *** ПАУЗА — нажмите P/Space для продолжения ***\n";
+
+    if (g.state==PAUSED)
+        printf(BOLD RED "\n  *** PAUZA — nazhmi P/Space ***" RESET "\n");
     else
-        std::cout << "\n  Стрелки: движение | P/Space: пауза | R: рестарт | ESC: меню\n";
+        printf(GRAY "\n  Arrows:move  P:pause  R:restart  ESC:menu" RESET "\n");
+    fflush(stdout);
 }
-#else
-void draw(const Snake& g) {
-    clear();
-    const int W = g.cfg.cols, H = g.cfg.rows;
-    attron(A_BOLD);
-    mvprintw(0, 1, "Счёт: %-6d  Рекорд: %-6d  Длина: %-4d  [%s]",
-             g.score, g.rec.get(g.diff), (int)g.body.size(),
-             g.diffName().c_str());
-    attroff(A_BOLD);
-    for (int y = 0; y < H; y++) {
-        for (int x = 0; x < W; x++) {
-            Point p = {x, y};
-            if (y == 0 || y == H-1) {
-                attron(COLOR_PAIR(3));
-                mvaddch(y+1, x*2, (x == 0 || x == W-1) ? '+' : '-');
-                if (x*2+1 < W*2) mvaddch(y+1, x*2+1, '-');
-                attroff(COLOR_PAIR(3));
-            } else if (x == 0 || x == W-1) {
-                attron(COLOR_PAIR(3));
-                mvaddch(y+1, x*2, '|');
-                attroff(COLOR_PAIR(3));
-            } else if (p == g.body.front()) {
-                attron(COLOR_PAIR(1) | A_BOLD);
-                mvaddch(y+1, x*2, '@');
-                attroff(COLOR_PAIR(1) | A_BOLD);
-            } else if (std::find(g.body.begin()+1, g.body.end(), p) != g.body.end()) {
-                attron(COLOR_PAIR(1));
-                mvaddch(y+1, x*2, 'o');
-                attroff(COLOR_PAIR(1));
-            } else if (p == g.food) {
-                attron(COLOR_PAIR(2) | A_BOLD);
-                mvaddch(y+1, x*2, '*');
-                attroff(COLOR_PAIR(2) | A_BOLD);
-            }
-        }
-    }
-    if (g.state == PAUSED) {
-        attron(COLOR_PAIR(4) | A_BOLD);
-        mvprintw(H/2+1, W-2, " *** ПАУЗА *** ");
-        attroff(COLOR_PAIR(4) | A_BOLD);
-    }
-    mvprintw(H+2, 1, "Стрелки: движение | P/Space: пауза | R: рестарт | ESC: меню");
-    refresh();
-}
-#endif
 
-// ─────────────────────────────────────────────
-// МЕНЮ
-// ─────────────────────────────────────────────
-
-void showMenu(Snake& g) {
-    system(CLEAR);
+void drawMenu(const Game& g) {
+    printf(CLR);
     printf("\n");
-    printf("  ╔══════════════════════════════════╗\n");
-    printf("  ║        И Г Р А   З М Е Й К А    ║\n");
-    printf("  ║             Вариант 15           ║\n");
-    printf("  ╠══════════════════════════════════╣\n");
-    printf("  ║  Уровень сложности:              ║\n");
-    printf("  ║  [1] Легкий   (рекорд: %d)\n", g.rec.easy);
-    printf("  ║  [2] Средний  (рекорд: %d)\n", g.rec.medium);
-    printf("  ║  [3] Сложный  (рекорд: %d)\n", g.rec.hard);
-    printf("  ╠══════════════════════════════════╣\n");
-    printf("  ║  [Q] Выход                       ║\n");
-    printf("  ╚══════════════════════════════════╝\n\n");
-    printf("  Выберите вариант: ");
+    printf("  +----------------------------------+\n");
+    printf("  |   IGRA  ZMEYKA  (Variant 15)    |\n");
+    printf("  +----------------------------------+\n");
+    printf("  |  Uroven slozhnosti:              |\n");
+    printf("  |  [1] Legkiy    rekord: %-5d     |\n", g.rec.v[0]);
+    printf("  |  [2] Sredniy   rekord: %-5d     |\n", g.rec.v[1]);
+    printf("  |  [3] Slozhnyy  rekord: %-5d     |\n", g.rec.v[2]);
+    printf("  +----------------------------------+\n");
+    printf("  |  [Q] Vyhod                       |\n");
+    printf("  +----------------------------------+\n\n");
+    printf("  Vash vybor: ");
+    fflush(stdout);
 }
 
-void showGameOver(const Snake& g) {
-    printf("\n\n");
-    printf("  ╔══════════════════════════════╗\n");
-    printf("  ║       ИГРА ОКОНЧЕНА          ║\n");
-    printf("  ╠══════════════════════════════╣\n");
-    printf("  ║  Счёт:   %d\n", g.score);
-    printf("  ║  Рекорд: %d\n", g.rec.get(g.diff));
-    printf("  ║  Длина:  %d\n", (int)g.body.size());
-    if (g.newRecord)
-        printf("  ║  *** НОВЫЙ РЕКОРД! ***       ║\n");
-    printf("  ╠══════════════════════════════╣\n");
-    printf("  ║  [R] Ещё раз  [M] Меню       ║\n");
-    printf("  ╚══════════════════════════════╝\n");
+void drawGameOver(const Game& g) {
+    printf("\n");
+    printf("  +------------------------------+\n");
+    printf("  |      IGRA  OKONCHENA         |\n");
+    printf("  +------------------------------+\n");
+    printf("  |  Schet:   %-6d             |\n", g.score);
+    printf("  |  Rekord:  %-6d             |\n", g.rec.get(g.diff));
+    printf("  |  Dlina:   %-6d             |\n", (int)g.body.size());
+    if (g.newRec)
+        printf("  |  *** NOVYY REKORD! ***       |\n");
+    printf("  +------------------------------+\n");
+    printf("  |  [R] Eshcho raz  [M] Menyu   |\n");
+    printf("  +------------------------------+\n");
+    fflush(stdout);
 }
 
-// ─────────────────────────────────────────────
-// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ: игровой цикл
-// ─────────────────────────────────────────────
+// ─── Игровой цикл ─────────────────────────────────────────────────
 
-void runGameLoop(Snake& game) {
-    system(CLEAR);
-    hideCursor();
-#ifndef _WIN32
-    nodelay(stdscr, TRUE);
-#endif
-    while (game.state == PLAYING || game.state == PAUSED) {
-        int key = getKey();
-#ifdef _WIN32
-        if      (key == KEY_UP    && game.dir != DOWN)  game.nextDir = UP;
-        else if (key == KEY_DOWN  && game.dir != UP)    game.nextDir = DOWN;
-        else if (key == KEY_LEFT  && game.dir != RIGHT) game.nextDir = LEFT;
-        else if (key == KEY_RIGHT && game.dir != LEFT)  game.nextDir = RIGHT;
-        else if (key == KEY_P || key == KEY_SPACE)
-            game.state = (game.state == PLAYING) ? PAUSED : PLAYING;
-        else if (key == KEY_R) { game.initGame(); }
-        else if (key == KEY_ESC) { game.state = MENU; return; }
-#else
-        if      (key == KEY_UP    && game.dir != DOWN)  game.nextDir = UP;
-        else if (key == KEY_DOWN  && game.dir != UP)    game.nextDir = DOWN;
-        else if (key == KEY_LEFT  && game.dir != RIGHT) game.nextDir = LEFT;
-        else if (key == KEY_RIGHT && game.dir != LEFT)  game.nextDir = RIGHT;
-        else if (key == 'p' || key == 'P' || key == ' ')
-            game.state = (game.state == PLAYING) ? PAUSED : PLAYING;
-        else if (key == 'r' || key == 'R') { game.initGame(); }
-        else if (key == 27) { game.state = MENU; return; }
-#endif
-        if (game.state == PLAYING) {
-            if (!game.step()) {
-                int oldRec = game.rec.get(game.diff);
-                game.rec.update(game.diff, game.score);
-                game.newRecord = (game.score > oldRec);
-                game.state = GAMEOVER;
+void runLoop(Game& g) {
+    printf(CLR HIDE_CUR);
+    fflush(stdout);
+    while (g.state==PLAYING || g.state==PAUSED) {
+        int k = readKey();
+        if      (k==1001 && g.dir!=DDOWN)  g.nextDir = DUP;
+        else if (k==1002 && g.dir!=DUP)    g.nextDir = DDOWN;
+        else if (k==1003 && g.dir!=DRIGHT) g.nextDir = DLEFT;
+        else if (k==1004 && g.dir!=DLEFT)  g.nextDir = DRIGHT;
+        else if (k=='p'||k=='P'||k==' ')
+            g.state = (g.state==PLAYING) ? PAUSED : PLAYING;
+        else if (k=='r'||k=='R') { g.init(); }
+        else if (k==27) { g.state=MENU; return; }
+
+        if (g.state==PLAYING) {
+            if (!g.step()) {
+                g.newRec = g.rec.update(g.diff, g.score);
+                g.state = GAMEOVER;
             }
         }
-        draw(game);
-        std::this_thread::sleep_for(std::chrono::milliseconds(game.getSpeed()));
+        drawGame(g);
+        std::this_thread::sleep_for(std::chrono::milliseconds(g.speed()));
     }
 }
 
-// ─────────────────────────────────────────────
-// MAIN
-// ─────────────────────────────────────────────
+// ─── main ─────────────────────────────────────────────────────────
 
 int main() {
     srand((unsigned)time(nullptr));
-
-#ifndef _WIN32
-    initscr();
-    noecho();
-    cbreak();
-    keypad(stdscr, TRUE);
-    nodelay(stdscr, TRUE);
-    start_color();
-    init_pair(1, COLOR_GREEN,  COLOR_BLACK);
-    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(3, COLOR_CYAN,   COLOR_BLACK);
-    init_pair(4, COLOR_RED,    COLOR_BLACK);
-    curs_set(0);
-#endif
+    enableRawMode();
+    atexit(disableRawMode);
 
     Config cfg = loadConfig("config.cfg");
-    Snake  game(cfg);
+    Game game(cfg);
 
     bool running = true;
     while (running) {
-        showMenu(game);
-        char ch;
-        std::cin >> ch;
-        switch (ch) {
+        disableRawMode();
+        drawMenu(game);
+
+        char ch = 0;
+        if (read(STDIN_FILENO, &ch, 1) != 1) ch = 'q';
+        enableRawMode();
+
+        switch(ch) {
             case '1': game.diff = EASY;   break;
             case '2': game.diff = MEDIUM; break;
             case '3': game.diff = HARD;   break;
             case 'q': case 'Q': running = false; continue;
             default: continue;
         }
-        game.initGame();
-        runGameLoop(game);
+        game.init();
+        runLoop(game);
 
         while (game.state == GAMEOVER) {
-#ifndef _WIN32
-            nodelay(stdscr, FALSE);
-#endif
-            system(CLEAR);
-            draw(game);
-            showGameOver(game);
+            disableRawMode();
+            printf(CLR);
+            drawGame(game);
+            drawGameOver(game);
             char ans = 0;
-            std::cin >> ans;
-            if (ans == 'r' || ans == 'R') {
-                game.initGame();
-#ifndef _WIN32
-                nodelay(stdscr, TRUE);
-#endif
-                runGameLoop(game);
+            if (read(STDIN_FILENO, &ans, 1) != 1) ans = 'm';
+            enableRawMode();
+            if (ans=='r'||ans=='R') {
+                game.init();
+                runLoop(game);
             } else {
                 game.state = MENU;
             }
         }
     }
 
-#ifndef _WIN32
-    endwin();
-#endif
-    printf("\nДо свидания!\n");
+    printf(CLR SHOW_CUR);
+    printf("Do svidaniya!\n");
     return 0;
 }
