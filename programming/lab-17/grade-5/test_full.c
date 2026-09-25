@@ -1,8 +1,4 @@
-/*
- * Оценка 5 — расширенный набор unit-тестов на CMocka.
- * Каждый тест регистрируется как отдельная ctest-цель, чтобы получить
- * красивый цветной вывод "X/Y Test #N: name ... Passed".
- */
+/* Набор проверок арифметического парсера tinyexpr на CMocka. */
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -13,14 +9,34 @@
 
 #define EPS 1e-9
 
-/* ----- 1. Базовая арифметика ----- */
+// 1. Базовая арифметика
 
-static void test_addition(void **state)       { (void)state; int e=0; assert_true(fabs(te_interp("1+2",&e)-3) < EPS); assert_int_equal(e, 0); }
-static void test_subtraction(void **state)    { (void)state; int e=0; assert_true(fabs(te_interp("10-4",&e)-6) < EPS); assert_int_equal(e, 0); }
-static void test_multiplication(void **state) { (void)state; int e=0; assert_true(fabs(te_interp("6*7",&e)-42) < EPS); assert_int_equal(e, 0); }
-static void test_division(void **state)       { (void)state; int e=0; assert_true(fabs(te_interp("100/4",&e)-25) < EPS); assert_int_equal(e, 0); }
+static void test_addition(void **state) {
+    (void)state;
+    int e = 0;
+    assert_true(fabs(te_interp("1+2",&e)-3) < EPS);
+    assert_int_equal(e, 0);
+}
+static void test_subtraction(void **state) {
+    (void)state;
+    int e = 0;
+    assert_true(fabs(te_interp("10-4",&e)-6) < EPS);
+    assert_int_equal(e, 0);
+}
+static void test_multiplication(void **state) {
+    (void)state;
+    int e = 0;
+    assert_true(fabs(te_interp("6*7",&e)-42) < EPS);
+    assert_int_equal(e, 0);
+}
+static void test_division(void **state) {
+    (void)state;
+    int e = 0;
+    assert_true(fabs(te_interp("100/4",&e)-25) < EPS);
+    assert_int_equal(e, 0);
+}
 
-/* ----- 2. Приоритет и скобки ----- */
+// 2. Приоритет и скобки
 
 static void test_precedence(void **state) {
     (void)state; int e=0;
@@ -40,7 +56,7 @@ static void test_unary_minus(void **state) {
     assert_int_equal(e, 0);
 }
 
-/* ----- 3. Степень ----- */
+// 3. Степень
 
 static void test_power_small(void **state) {
     (void)state; int e=0;
@@ -57,7 +73,7 @@ static void test_power_left_assoc(void **state) {
     assert_int_equal(e, 0);
 }
 
-/* ----- 4. Встроенные функции ----- */
+// 4. Встроенные функции
 
 static void test_sqrt(void **state) {
     (void)state; int e=0;
@@ -92,10 +108,20 @@ static void test_pi_constant(void **state) {
     assert_true(fabs(pi - 3.14159265358979) < 1e-6);
 }
 
-/* ----- 5. Тригонометрия ----- */
+// 5. Тригонометрия
 
-static void test_sin_zero(void **state)   { (void)state; int e=0; assert_true(fabs(te_interp("sin(0)", &e)) < EPS); assert_int_equal(e, 0); }
-static void test_cos_zero(void **state)   { (void)state; int e=0; assert_true(fabs(te_interp("cos(0)", &e) - 1.0) < EPS); assert_int_equal(e, 0); }
+static void test_sin_zero(void **state) {
+    (void)state;
+    int e = 0;
+    assert_true(fabs(te_interp("sin(0)", &e)) < EPS);
+    assert_int_equal(e, 0);
+}
+static void test_cos_zero(void **state) {
+    (void)state;
+    int e = 0;
+    assert_true(fabs(te_interp("cos(0)", &e) - 1.0) < EPS);
+    assert_int_equal(e, 0);
+}
 
 static void test_pythagorean(void **state) {
     (void)state; int e=0;
@@ -105,7 +131,7 @@ static void test_pythagorean(void **state) {
     assert_true(fabs(r - 1.0) < EPS);
 }
 
-/* ----- 6. Особые значения ----- */
+// 6. Особые значения
 
 static void test_division_by_zero(void **state) {
     (void)state; int e=0;
@@ -121,7 +147,7 @@ static void test_sqrt_of_negative(void **state) {
     assert_true(isnan(r));
 }
 
-/* ----- 7. Синтаксические ошибки ----- */
+// 7. Синтаксические ошибки
 
 static void test_error_trailing_op(void **state) {
     (void)state; int e=0;
@@ -147,7 +173,7 @@ static void test_error_empty_string(void **state) {
     assert_true(e > 0);
 }
 
-/* ----- main ----- */
+
 
 int main(void) {
     const struct CMUnitTest tests[] = {

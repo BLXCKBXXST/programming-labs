@@ -4,7 +4,6 @@
 #include <time.h>
 #include "../include/list.h"
 
-// Создаёт структуру Sneaker, заполненную случайными данными
 Sneaker *CreateSneaker(void) {
     char *brands[] = {"Nike", "Adidas", "Puma"};
     char *models[] = {"Pro", "Super", "Ultra"};
@@ -17,16 +16,14 @@ Sneaker *CreateSneaker(void) {
     return s;
 }
 
-// Создаёт узел и инициализирует указатель data (пункт 4)
 Node *CreateNode(void) {
     Node *node = malloc(sizeof(Node));
-    node->data = CreateSneaker(); // инициализируем указатель на структуру
+    node->data = CreateSneaker();
     node->next = NULL;
     node->prev = NULL;
     return node;
 }
 
-// Добавляет узел в конец двусвязного списка
 void PushBack(Node **head, Node **tail) {
     Node *node = CreateNode();
 
@@ -36,15 +33,11 @@ void PushBack(Node **head, Node **tail) {
         return;
     }
 
-    // новый узел смотрит назад на старый хвост
     node->prev    = *tail;
-    // старый хвост смотрит вперёд на новый
     (*tail)->next = node;
-    // обновляем хвост
     *tail = node;
 }
 
-// Печатает информацию об одном узле
 void PrintNode(Node *node, int idx) {
     printf("[%d] %-10s %-10s размер: %-4d цена: $%d\n",
            idx,
@@ -60,7 +53,7 @@ void FreeList(Node *head) {
     while (head != NULL) {
         Node *tmp = head;
         head = head->next;
-        free(tmp->data); // сначала освобождаем структуру Sneaker
-        free(tmp);       // потом сам узел
+        free(tmp->data);
+        free(tmp);
     }
 }
