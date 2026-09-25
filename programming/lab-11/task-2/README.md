@@ -27,7 +27,7 @@ void format(NumberRepr *number) {
 
 Число `1025` форматируется в `"1025"` — это **4 символа плюс терминальный `\0`** = 5 байт. В `str[4]` помещается только 4 — пятый байт (`\0`) уходит **за границу буфера** и попадает в первый байт следующего поля `num`. На x86 little-endian это младший байт `int`, и значение `num` становится `1025 & 0xFFFFFF00 = 1024`. А если в форматирование попадает много нулей — может вообще обнулиться.
 
-> Это **buffer overflow** — классическая дыра в C. AddressSanitizer (`gcc -fsanitize=address`) сразу её ловит.
+Это **buffer overflow** — классическая дыра в C. AddressSanitizer (`gcc -fsanitize=address`) сразу её ловит.
 
 ## Фикс
 
@@ -56,8 +56,8 @@ gcc after.c -o after && ./after
 # num: 1025
 ```
 
-> Полезные инструменты диагностики:
+Полезные инструменты диагностики:
 > ```bash
-> gcc -fsanitize=address before.c -o before-asan && ./before-asan
-> # AddressSanitizer покажет точную строку, где произошёл overflow
+gcc -fsanitize=address before.c -o before-asan && ./before-asan
+# AddressSanitizer покажет точную строку, где произошёл overflow
 > ```
