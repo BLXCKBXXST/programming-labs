@@ -13,87 +13,87 @@ CMakeCache.txt
 cmake_install.cmake
 
 # Конкретные бинарники из лаб (без расширений)
-programming/lab-00/task0/hello
-programming/lab-00/task1/output
-programming/lab-00/task2/overflow
-programming/lab-00/task3/chars
-programming/lab-00/task4/after
+lab-00/task0/hello
+lab-00/task1/output
+lab-00/task2/overflow
+lab-00/task3/chars
+lab-00/task4/after
 
-programming/lab-01/grade-3/leap
-programming/lab-01/grade-4/temperature
-programming/lab-01/grade-5/area
+lab-01/grade-3/leap
+lab-01/grade-4/temperature
+lab-01/grade-5/area
 
-programming/lab-02/alg08_factorial
-programming/lab-02/alg09_maxdigit
-programming/lab-02/alg10_reverse
-programming/lab-02/alg11_log2
-programming/lab-02/alg12_digitsum
+lab-02/alg08_factorial
+lab-02/alg09_maxdigit
+lab-02/alg10_reverse
+lab-02/alg11_log2
+lab-02/alg12_digitsum
 
-programming/lab-02-2/grade-4/square
-programming/lab-02-2/grade-5/stairs
-programming/lab-02-2/grade-star/spiral
+lab-02-2/grade-4/square
+lab-02-2/grade-5/stairs
+lab-02-2/grade-star/spiral
 
-programming/lab-11/task-1/after
-programming/lab-11/task-2/after
-programming/lab-11/task-3/after
-programming/lab-11/task-4/after
+lab-11/task-1/after
+lab-11/task-2/after
+lab-11/task-3/after
+lab-11/task-4/after
 
-programming/lab-15-2/src/task1
-programming/lab-15-2/src/task2
-programming/lab-15-2/src/task3
-programming/lab-15-2/src/task4
-programming/lab-15-2/src/task5
-programming/lab-15-2/src/task_star
+lab-15-2/src/task1
+lab-15-2/src/task2
+lab-15-2/src/task3
+lab-15-2/src/task4
+lab-15-2/src/task5
+lab-15-2/src/task_star
 
-programming/lab-16/grade-3/ex1_create
-programming/lab-16/grade-3/ex2_join
-programming/lab-16/grade-3/ex3_args
-programming/lab-16/grade-3/ex4_cancel
-programming/lab-16/grade-3/ex5_cleanup
-programming/lab-16/grade-3/ex6_sleepsort
-programming/lab-16/grade-4/ex7_sync
-programming/lab-16/grade-4/ex8_matmul
-programming/lab-16/grade-4/ex9_benchmark
-programming/lab-16/grade-5/chat
-programming/lab-16/grade-star/din_phil
-programming/lab-16/grade-star/din_phil_fixed
+lab-16/grade-3/ex1_create
+lab-16/grade-3/ex2_join
+lab-16/grade-3/ex3_args
+lab-16/grade-3/ex4_cancel
+lab-16/grade-3/ex5_cleanup
+lab-16/grade-3/ex6_sleepsort
+lab-16/grade-4/ex7_sync
+lab-16/grade-4/ex8_matmul
+lab-16/grade-4/ex9_benchmark
+lab-16/grade-5/chat
+lab-16/grade-star/din_phil
+lab-16/grade-star/din_phil_fixed
 # benchmark.csv остаётся (исходные данные), benchmark.png тоже (артефакт лабы)
 
-programming/lab-17/grade-3/test_simple
-programming/lab-17/grade-4/test_cmocka
+lab-17/grade-3/test_simple
+lab-17/grade-4/test_cmocka
 # lab-17/grade-5/test_full собирается через CMake → попадает в build/, уже игнорится
 
 # lab-10 / 12 / 13 / 14 / 15 — артефакты сборки
-programming/lab-10/grade-3/fraction
-programming/lab-10/grade-4/fraction
-programming/lab-10/grade-5/fraction_dyn
-programming/lab-10/grade-star/fraction
-programming/lab-10/grade-star/*.o
+lab-10/grade-3/fraction
+lab-10/grade-4/fraction
+lab-10/grade-5/fraction_dyn
+lab-10/grade-star/fraction
+lab-10/grade-star/*.o
 
-programming/lab-12/grade-3/sneakers
-programming/lab-12/grade-4/sneakers
-programming/lab-12/grade-5/sneakers
-programming/lab-12/grade-star/sneakers
+lab-12/grade-3/sneakers
+lab-12/grade-4/sneakers
+lab-12/grade-5/sneakers
+lab-12/grade-star/sneakers
 
-programming/lab-13/grade-3/sneakers
-programming/lab-13/grade-4/build/
-programming/lab-13/grade-5/build/
+lab-13/grade-3/sneakers
+lab-13/grade-4/build/
+lab-13/grade-5/build/
 
-programming/lab-14/grade-3/sneakers
-programming/lab-14/grade-4/sneakers
-programming/lab-14/grade-5/sneakers_list
+lab-14/grade-3/sneakers
+lab-14/grade-4/sneakers
+lab-14/grade-5/sneakers_list
 
-programming/lab-15/grade-3/program
-programming/lab-15/grade-3/program_syscall
-programming/lab-15/grade-5/program
-programming/lab-15/grade-5/database.dat
-programming/lab-15/grade-5/database.rle
-programming/lab-15/grade-5/database_restored.dat
+lab-15/grade-3/program
+lab-15/grade-3/program_syscall
+lab-15/grade-5/program
+lab-15/grade-5/database.dat
+lab-15/grade-5/database.rle
+lab-15/grade-5/database_restored.dat
 
 # Если lab-15/grade-5/program запустить из корня lab-15, файлы создаются здесь
-programming/lab-15/database.dat
-programming/lab-15/database.rle
-programming/lab-15/database_restored.dat
+lab-15/database.dat
+lab-15/database.rle
+lab-15/database_restored.dat
 
 # Python артефакты (benchmark.py в lab-16 + любые ноутбуки)
 __pycache__/
