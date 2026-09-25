@@ -115,3 +115,8 @@ vgcore.*
 # Системное
 .DS_Store
 Thumbs.db
+
+# Бинарные файлы лабораторных №4 и №9
+programming/lab-04/task13/task13
+programming/lab-04/task14/task14
+programming/lab-09/sort

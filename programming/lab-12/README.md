@@ -22,5 +22,3 @@ make grade-star
 make clean
 ```
 
-![Результат сортировки](grade-3/sort.png)
-![Замер времени](grade-5/benchmark.png)
