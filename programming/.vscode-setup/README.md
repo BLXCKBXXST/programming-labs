@@ -89,7 +89,7 @@ git config --global user.email "твой@email.com"
 3. Напиши: `Git: Clone` и нажми Enter.
 4. Вставь ссылку:
    ```
-   https://github.com/BLXCKBXXST/lab-works.git
+   https://github.com/BLXCKBXXST/programming-labs.git
    ```
 5. Выбери папку, куда сохранить (например `C:\Users\ТвоёИмя\Documents`).
 6. Нажми **Open** — проект откроется в VS Code.
@@ -105,11 +105,15 @@ cd C:\Users\YourName\Documents
 cd ~/Documents
 
 # клонировать
-git clone https://github.com/BLXCKBXXST/lab-works.git
+git clone https://github.com/BLXCKBXXST/programming-labs.git
 
 # открыть папку в VS Code
-code lab-works
+code programming-labs
 ```
+
+---
+
+Лабораторные по программированию находятся внутри `programming/`, а работы по ООП — в `oop/`.
 
 ---
 
