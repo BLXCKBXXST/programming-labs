@@ -1,16 +1,8 @@
-# Лабораторная №17 — Модульное тестирование
+# Лаба 17. Тестирование
 
-Тестирование сторонней библиотеки [tinyexpr](external/tinyexpr) для вычисления арифметических выражений. Библиотека хранится без изменений, её лицензия — [LICENSE](external/tinyexpr/LICENSE).
+Пробуем тестировать чужую библиотеку [tinyexpr](external/tinyexpr/) для арифметических выражений. Оригинальный код библиотеки не меняем; [лицензия](external/tinyexpr/LICENSE) лежит рядом.
 
-| Оценка | Тесты | Файл |
-|---|---|---|
-| 3 | `assert.h`, 12 проверок | [grade-3/test_simple.c](grade-3/test_simple.c) |
-| 4 | CMocka, табличные проверки | [grade-4/test_cmocka.c](grade-4/test_cmocka.c) |
-| 5 | CMocka, расширенный набор и запуск через CTest | [grade-5/test_full.c](grade-5/test_full.c) |
-
-## Сборка и запуск
-
-Нужны CMake и CMocka:
+[Простые assert](grade-3/), [CMocka](grade-4/) и [расширенный набор тестов с CTest](grade-5/). Для последних двух нужна установленная CMocka.
 
 ```bash
 cmake -S . -B build
@@ -18,4 +10,4 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-Либо `make test` из этой папки. Примеры тестовых случаев и подробности — в README соответствующих вариантов.
+Можно короче: `make test`.
