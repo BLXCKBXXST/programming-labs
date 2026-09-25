@@ -4,8 +4,8 @@
 
 Callback (колбэк) — это когда мы **передаём функцию как аргумент** в другую функцию.
 
-Вместо того чтобы писать отдельную `SortByPrice`, `SortBySize`, `SortByBrand`...  
-Мы пишем **одну** `BubbleSortCallback`, которая не знает *как* сравнивать —  
+Вместо того чтобы писать отдельную `SortByPrice`, `SortBySize`, `SortByBrand`...
+Мы пишем **одну** `BubbleSortCallback`, которая не знает *как* сравнивать —
 она спрашивает об этом у переданной функции.
 
 ## Как это выглядит в коде
@@ -16,7 +16,7 @@ void BubbleSortCallback(Sneaker *arr, int n,
                         int (*cmp)(const Sneaker *, const Sneaker *));
 ```
 
-Читаем `int (*cmp)(const Sneaker *, const Sneaker *)` как:  
+Читаем `int (*cmp)(const Sneaker *, const Sneaker *)` как:
 «`cmp` — это указатель на функцию, которая принимает два кроссовка и возвращает int»
 
 ## Функции-компараторы
