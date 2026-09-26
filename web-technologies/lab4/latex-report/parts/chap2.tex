@@ -1,0 +1,139 @@
+\chapter{Описание стенда и подготовка}
+\label{ch:stand}
+
+\section{Конфигурация виртуального стенда}
+\label{sec:stand-conf}
+
+Для выполнения практической работы использовались две виртуальные машины
+на платформе VirtualBox:
+\begin{itemize}
+  \item \textbf{gateway}~— Ubuntu~20.04.5~LTS Server, два сетевых адаптера:
+    \begin{itemize}
+      \item \texttt{enp0s3}~(NAT): адрес \texttt{10.0.2.15/24},
+        шлюз \texttt{10.0.2.2}, DNS \texttt{8.8.8.8};
+      \item \texttt{enp0s8}~(Внутренняя сеть): \texttt{192.168.\cfgLabStudentN.1/24}.
+    \end{itemize}
+  \item \textbf{Desktop1}~— Ubuntu Desktop, один адаптер (Внутренняя сеть).
+\end{itemize}
+
+% — Скриншот: настройка сетевых адаптеров ВМ gateway в VirtualBox —
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\textwidth]{img/01_vbox_adapters}
+  \caption{Настройка сетевых адаптеров ВМ gateway в VirtualBox}
+  \label{fig:vbox-adapters}
+\end{figure}
+
+\section{Настройка сетевых интерфейсов через Netplan}
+\label{sec:netplan-setup}
+
+После клонирования ВМ из шаблонов поднимаем права до root и просматриваем
+список интерфейсов:
+
+\begin{lstlisting}
+sudo su
+ip a
+\end{lstlisting}
+
+% — Скриншот: вывод команды ip a (список интерфейсов до настройки) —
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\textwidth]{img/02_ip_a_before}
+  \caption{Список сетевых интерфейсов до настройки (\texttt{ip a})}
+  \label{fig:ip-a-before}
+\end{figure}
+
+Редактируем конфигурационный файл Netplan:
+
+\begin{lstlisting}
+nano /etc/netplan/00-installer-config.yaml
+\end{lstlisting}
+
+% — Скриншот: содержимое файла 00-installer-config.yaml в nano —
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\textwidth]{img/03_netplan_yaml}
+  \caption{Файл конфигурации Netplan \texttt{00-installer-config.yaml}}
+  \label{fig:netplan-yaml}
+\end{figure}
+
+Содержимое файла для VirtualBox (тип адаптера NAT):
+
+\begin{lstlisting}
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp0s3:
+      dhcp4: no
+      addresses:
+        - 10.0.2.15/24
+      gateway4: 10.0.2.2
+      nameservers:
+        addresses: [8.8.8.8]
+    enp0s8:
+      dhcp4: no
+      addresses:
+        - 192.168.N.1/24
+\end{lstlisting}
+
+Где \texttt{N}~— номер студента в журнале. Применяем конфигурацию и
+проверяем результат:
+
+\begin{lstlisting}
+netplan apply
+ip a
+ping ya.ru
+\end{lstlisting}
+
+% — Скриншот: вывод ip a после netplan apply (интерфейсы получили адреса) —
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\textwidth]{img/04_ip_a_after}
+  \caption{Состояние интерфейсов после \texttt{netplan apply}}
+  \label{fig:ip-a-after}
+\end{figure}
+
+% — Скриншот: успешный ping ya.ru с сервера —
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\textwidth]{img/05_ping_yaru_server}
+  \caption{Проверка доступа в Интернет с сервера (\texttt{ping ya.ru})}
+  \label{fig:ping-server}
+\end{figure}
+
+После \texttt{netplan apply} интерфейс \texttt{enp0s3} получил адрес
+\texttt{10.0.2.15/24}, \texttt{enp0s8}~—
+\texttt{192.168.\cfgLabStudentN.1/24}.
+Доступ в Интернет с сервера подтверждён командой \texttt{ping~ya.ru}.
+
+\section{Настройка клиента Desktop1 вручную}
+\label{sec:desktop-manual}
+
+До развёртывания DHCP-сервера IP-адрес клиенту назначался вручную через
+графический интерфейс \texttt{nm-connection-editor} со следующими параметрами:
+\begin{itemize}
+  \item IP-адрес: \texttt{192.168.\cfgLabStudentN.10};
+  \item маска подсети: \texttt{255.255.255.0};
+  \item шлюз: \texttt{192.168.\cfgLabStudentN.1};
+  \item DNS-сервер: \texttt{192.168.\cfgLabStudentN.1}.
+\end{itemize}
+
+% — Скриншот: настройка IPv4 вручную в nm-connection-editor на Desktop1 —
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.75\textwidth]{img/06_desktop_ip_manual}
+  \caption{Настройка статического IP-адреса на клиенте Desktop1}
+  \label{fig:desktop-manual}
+\end{figure}
+
+Проверка связи: \texttt{ping~192.168.\cfgLabStudentN.1}~— запросы
+проходят успешно.
+
+% — Скриншот: ping с Desktop1 на шлюз  192.168.N.1 —
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\textwidth]{img/07_ping_gateway_from_desktop}
+  \caption{Проверка связи с клиента до шлюза (\texttt{ping 192.168.\cfgLabStudentN.1})}
+  \label{fig:ping-gw}
+\end{figure}

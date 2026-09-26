@@ -1,0 +1,59 @@
+\chapter{Теоретические сведения}
+\label{ch:theory}
+
+\section{Облачное хранилище и Seafile}
+
+\textbf{Облачное хранилище} (cloud storage) — модель хранения данных, при которой
+файлы размещаются на удалённых серверах и доступны через сеть. Ключевые преимущества:
+централизованное управление, синхронизация между устройствами, совместный доступ.
+
+\textbf{Seafile} — открытое ПО с открытым исходным кодом (лицензия AGPLv3 / Apache~2.0).
+Основные компоненты:
+\begin{itemize}
+  \item \textbf{Seafile Server} — демон хранения и синхронизации файлов, работает
+        на порту~\texttt{8082};
+  \item \textbf{Seahub} — веб-приложение на Django, GUI и REST~API, порт~\texttt{8000};
+  \item \textbf{Seafile Client} — настольный клиент (Windows / macOS / Linux) и
+        мобильные приложения для синхронизации.
+\end{itemize}
+
+\section{Стек технологий}
+
+\textbf{MariaDB} — реляционная СУБД, совместимая с MySQL, используется как бэкенд
+для трёх баз данных Seafile: \texttt{ccnet-db}, \texttt{seafile-db}, \texttt{seahub-db}.
+
+\textbf{Nginx} — высокопроизводительный веб-сервер и обратный прокси.
+В данной работе Nginx принимает HTTP-запросы на порту~\texttt{80}
+и проксирует их на \texttt{127.0.0.1:8000} (Seahub):
+\begin{lstlisting}
+location / {
+    proxy_pass http://127.0.0.1:8000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}
+\end{lstlisting}
+
+\textbf{Python~3 / pip} — платформа для выполнения Seahub. Необходимые
+Python-пакеты устанавливаются командой \texttt{pip3 install}:
+\texttt{django}, \texttt{Pillow}, \texttt{mysqlclient}, \texttt{sqlalchemy},
+\texttt{pycryptodome} и др.
+
+\section{Схема взаимодействия компонентов}
+
+После полной настройки клиентская машина Desktop обращается к серверу по имени
+\texttt{seafile} (разрешается через BIND9 на gateway). Nginx принимает соединение
+и перенаправляет запрос в Seahub. Seahub взаимодействует с Seafile-сервером
+через CCNET~API; данные хранятся в директории \texttt{/opt/seafile/seafile-data}.
+Информация о библиотеках, пользователях и правах хранится в MariaDB.
+
+\section{DNS-запись для seafile}
+
+Сервер \texttt{seafile} получает IP~\texttt{192.168.\cfgLabStudentN.4} и
+регистрируется в прямой зоне BIND9 на \texttt{gateway}:
+\begin{lstlisting}
+seafile  IN  A  192.168.N.4
+\end{lstlisting}
+Клиент Desktop после этого может обращаться к серверу по короткому имени
+\texttt{seafile} или по FQDN \texttt{seafile.\cfgDomain}.
+
+\endinput

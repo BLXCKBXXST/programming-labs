@@ -1,0 +1,131 @@
+# web-technologies-labs
+
+Лабораторные работы по дисциплине «Web-технологии» (СибГУТИ).
+
+Серверные лабы (lab4–lab9) — Linux-администрирование на VirtualBox + Ubuntu 20.04 Server/Desktop с bash-автоматизацией.  
+Лабы по веб-дизайну (lab10+) — макеты в Figma.  
+Все лабы оформляются LaTeX-отчётом по ГОСТ 7.32 (XeLaTeX), готовым для импорта в Overleaf.
+
+---
+
+> ⚠️ **Важно**
+>
+> Методички преподавателя для серверных лаб используют другие версии ВМ и зависимостей — все скрипты в этом репозитории реализованы на **Ubuntu 20.04** с зависимостями под эту версию.  
+> Но LaTeX-отчёты написаны в соответствии с требованиями методички и фактическая реализация может отличаться от методички — это нормально.
+>
+> Для дизайн-лаб (Figma) ВМ и `config.sh` не используются — работа ведётся в браузере или desktop-приложении Figma.
+
+---
+
+## Скачать Ubuntu 20.04
+
+| Образ | Ссылка |
+|-------|--------|
+| 🖥️ Ubuntu 20.04 Desktop | [ubuntu-20.04.6-desktop-amd64.iso](https://releases.ubuntu.com/20.04/ubuntu-20.04.6-desktop-amd64.iso) |
+| 🔧 Ubuntu 20.04 Server | [ubuntu-20.04.6-live-server-amd64.iso](https://releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso) |
+
+---
+
+## Лабораторные работы
+
+| Лаба | Тема | Что делается | Скрипты | LaTeX-отчёт | Скриншоты | Методичка |
+|------|------|----------------|---------|------------|------------|------------|
+| Lab 4 | NAT + DHCP | Настройка шлюза (gateway) с NAT и iptables, установка DHCP-сервера isc-dhcp-server | [lab4/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab4) | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab4/latex-report) | [screenshots/](lab4/latex-report/screenshots/README.md) | [PDF 4](lab4/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab4).pdf) |
+| Lab 5 | DNS + DDNS | Установка BIND9, настройка прямой/обратной DNS-зоны, интеграция с DHCP (динамические DNS-записи) | [lab5/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab5) | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab5/latex-report) | [screenshots/](lab5/latex-report/screenshots/README.md) | [PDF 5](lab5/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab5).pdf) |
+| Lab 6 | Seafile | Развёртывание облачного хранилища Seafile на MariaDB + Nginx, подключение Desktop-клиента | [lab6/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab6) | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab6/latex-report) | [screenshots/](lab6/latex-report/screenshots/README.md) | [PDF 6](lab6/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab6).pdf) |
+| Lab 7 | iRedMail | Настройка полноценного почтового сервера iRedMail (Postfix + Dovecot + OpenLDAP + Nginx), отправка писем | [lab7/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab7) | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab7/latex-report) | [screenshots/](lab7/latex-report/screenshots/README.md) | [PDF 7](lab7/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab7).pdf) |
+| Lab 8 | WordPress + PrivateBin | Развёртывание LAMP-стека (Apache2 + MySQL + PHP), установка WordPress и PrivateBin с HTTPS | [lab8/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab8) | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab8/latex-report) | [screenshots/](lab8/latex-report/screenshots/README.md) | [PDF 8](lab8/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab8).pdf) |
+| Lab 9 | Ansible Monitoring | Автоматизация сбора информации с узлов сети через Ansible (SSH-ключи, inventory, playbook) | [lab9/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab9) | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab9/latex-report) | [screenshots/](lab9/latex-report/screenshots/README.md) | [PDF 9](lab9/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab9).pdf) |
+| Lab 10 | Основы Figma | Макет интернет-магазина домашних растений (1440 px) + адаптивы 768 px и 360 px, Layout grid, Constraints | — | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab10/latex-report) | [screenshots/](lab10/latex-report/screenshots/README.md) | [PDF 10](lab10/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab10).pdf) |
+| Lab 11 | Веб-дизайн | Многостраничный макет сайта чемпионата по фиджитал-футболу (5 страниц: главная, команда, участник, турнирная таблица, магазин) + адаптивы 768 px и 360 px | — | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab11/latex-report) | [screenshots/](lab11/latex-report/screenshots/README.md) | [PDF 11](lab11/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab11).pdf) |
+| Lab 12 | Основы HTML и CSS | Четыре независимых Codepen-задания: разметка текста и атрибуты, списки и таблицы, CSS-селекторы, оформление текстовых блоков (типографика, фоны, маркеры списков) | — | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab12/latex-report) | [screenshots/](lab12/latex-report/screenshots/README.md) | [PDF 12](lab12/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab12).pdf) |
+| Lab 13 | Погружение в JavaScript | Четыре урока: переменные и бонусный баланс, массивы и поиск через `includes`, SPA-сайт «Персонажи Marvel» (fetch к API, карточки и модалки на Bootstrap 5), деплой на собственный сервер за Caddy с TLS Let's Encrypt | [lab13/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab13) | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab13/latex-report) | [screenshots/](lab13/latex-report/screenshots/README.md) | [PDF 13](lab13/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab13).pdf) |
+| Lab 14 | Резюме, PDF, Material Wave | Интерактивное веб-резюме на чистых HTML/CSS/JS: редактирование текста «на месте» (`contenteditable`), сохранение правок и фото в `localStorage`, экспорт в PDF через `window.print()` + `@media print`, CSS-анимации изменений и эффект Material Wave (ripple); деплой на собственный сервер за Caddy | [lab14/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab14) | [latex-report/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab14/latex-report) | [screenshots/](lab14/latex-report/screenshots/README.md) | [PDF 14](lab14/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%BA%D0%B0%20(lab14).pdf) |
+| Lab 15 | Python (Stepik) | Решения учебных задач курса по программированию на Python: переменные и присваивание, числовые типы, модуль math, ввод-вывод, операторы сравнения и логические операторы (~70 подвигов) | [lab15/](https://github.com/BLXCKBXXST/Subjects/tree/main/web-technologies/lab15) | — | — | — |
+
+---
+
+## Топология сети
+
+Применимо к серверным лабам (lab4–lab9). Все они строятся на одной внутренней сети VirtualBox (`intnet`):
+
+```
+ Internet
+    |
+enp0s3 (NAT)
+ [gateway]  192.168.N.1
+enp0s8 (intnet)
+    |
+    ├── desktop1    192.168.N.10  (Ubuntu Desktop, DHCP)
+    ├── seafile     192.168.N.4   (Seafile)
+    ├── mail        192.168.N.5   (iRedMail)
+    ├── wordpress   192.168.N.6   (LAMP + WordPress)
+    └── privatebin  192.168.N.7   (PrivateBin)
+```
+
+> `N` — твой номер студента, задаётся один раз в `config.tex` и проходит через все отчёты автоматически.
+
+Lab 10 (Figma) ВМ не использует — работа ведётся в браузере, скрипт-каркаса и `config.sh` в папке `lab10/` нет.
+
+---
+
+## Структура репозитория
+
+```
+web-technologies-labs/
+│
+├── labN/                          ← папка каждой лабораторной работы
+│   ├── README.md                  ← описание лабы + ссылка на скачивание scripts.zip
+│   ├── config.sh                  ← общие переменные (IP, имя студента, сеть) — только серверные лабы
+│   ├── <vm>_labN_<task>.sh        ← bash-скрипты автоматизации — только серверные лабы
+│   ├── Методичка (labN).pdf       ← PDF методички преподавателя
+│   └── latex-report/              ← LaTeX-отчёт для Overleaf
+│       ├── README.md              ← ссылка на скачивание overleaf ZIP
+│       ├── main.tex               ← точка входа: подключает все части отчёта
+│       ├── config.tex             ← настройки студента (номер, ФИО, группа)
+│       ├── parts/                 ← разделы отчёта (intro, chap1..N, conclusion)
+│       │   ├── title.tex          ← титульная страница
+│       │   ├── intro.tex          ← введение
+│       │   ├── chap1.tex          ← глава 1 (теория / топология)
+│       │   ├── chap2.tex          ← глава 2 (практика / команды)
+│       │   ├── chap3.tex          ← глава 3 (результаты / проверка)
+│       │   └── conclusion.tex     ← заключение
+│       ├── screenshots/           ← скриншоты для отчёта (PNG/JPG)
+│       │   ├── screenshots.sh     ← скрипт автоматического сбора скриншотов
+│       │   └── README.md          ← список скриншотов с подписями
+│       ├── img/                   ← прочие изображения (выполнение скриптов)
+│       ├── fonts/                 ← шрифты (Times New Roman и др. для ГОСТ)
+│       └── labN_latex_report.pdf  ← скомпилированный PDF отчёта
+│
+├── LaTeX_g7-32_template_tsvs-main/  ← базовый LaTeX-шаблон по ГОСТ 7.32
+│
+└── .github/
+    └── workflows/
+        └── release-latex.yml      ← GitHub Actions: собирает ZIP для Overleaf
+                                      и scripts.zip при каждом push в main
+```
+
+---
+
+## 💡 Совет: общая папка VirtualBox (опционально)
+
+Если хочешь редактировать скрипты на хосте и сразу видеть изменения на всех ВМ — настрой глобальную общую папку **один раз** на золотом образе, и все клоны унаследуют её автоматически.
+
+**Шаг 1.** В VirtualBox → Файл → Настройки → Общие папки → Добавить:
+- Путь на хосте: папка с репозиторием
+- Постоянное подключение: ✅
+- Автоподключение: ✅
+- Сделать глобальной: ✅
+
+**Шаг 2.** Установить зависимости внутри ВМ (достаточно сделать только на золотом образе):
+
+```bash
+sudo apt install -y virtualbox-guest-utils build-essential dkms
+sudo usermod -aG vboxsf $USER
+# перезагрузить ВМ
+```
+
+После перезагрузки папка появится автоматически в `/media/sf_<имя_папки>`. Все клоны этого образа сразу имеют доступ — никакой дополнительной настройки не требуется.
+
+> Настройка выполняется дважды: для золотого образа Server и золотого образа Desktop.  
+> Все последующие клоны унаследуют настройку автоматически.

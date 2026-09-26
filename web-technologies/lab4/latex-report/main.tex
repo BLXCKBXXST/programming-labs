@@ -1,0 +1,143 @@
+\documentclass[a4paper,14pt,oneside,openany]{memoir}
+
+%%% Язык и шрифт %%%
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage[indentfirst=true,forceheadingpunctuation=false]{russian}
+\setotherlanguages{english}
+
+\setmainfont{Times New Roman}[
+    Path           = ./fonts/,
+    Extension      = .ttf,
+    UprightFont    = times,
+    BoldFont       = timesbd,
+    ItalicFont     = timesi,
+    BoldItalicFont = timesbi
+]
+\newfontfamily\cyrillicfont{Times New Roman}[
+    Path           = ./fonts/,
+    Extension      = .ttf,
+    UprightFont    = times,
+    BoldFont       = timesbd,
+    ItalicFont     = timesi,
+    BoldItalicFont = timesbi
+]
+\newfontfamily\cyrillicfonttt{FreeMono}
+
+%%% Поля (ГОСТ 7.32) %%%
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+
+%%% Межстрочный интервал и отступы %%%
+\pagestyle{plain}
+\parindent=1.25cm
+\usepackage{indentfirst}
+
+%%% Стиль заголовков %%%
+\setsecnumdepth{subsection}
+\renewcommand*{\chapterheadstart}{}
+\renewcommand*{\printchaptername}{}
+\renewcommand*{\chapnumfont}{\normalfont\bfseries}
+\renewcommand*{\afterchapternum}{\hspace{1em}}
+\renewcommand*{\printchaptertitle}{\normalfont\bfseries\centering\MakeUppercase}
+\setbeforesecskip{20pt}
+\setaftersecskip{10pt}
+\setsecheadstyle{\raggedright\normalfont\bfseries}
+\setbeforesubsecskip{16pt}
+\setaftersubsecskip{8pt}
+\setsubsecheadstyle{\raggedright\normalfont\bfseries}
+
+%%% Оглавление %%%
+\addto\captionsrussian{\renewcommand\contentsname{Содержание}}
+\setrmarg{2.55em plus1fil}
+\renewcommand{\aftertoctitle}{\afterchaptertitle \vspace{-\cftbeforechapterskip}}
+\renewcommand*{\cftchapternumwidth}{1.5em}
+\renewcommand*{\cftchapterfont}{\normalfont\MakeUppercase}
+\renewcommand*{\cftchapterpagefont}{\normalfont}
+\renewcommand*{\cftchapterdotsep}{\cftdotsep}
+\renewcommand*{\cftdotsep}{1}
+\renewcommand*{\cftchapterleader}{\cftdotfill{\cftchapterdotsep}}
+\maxtocdepth{subsection}
+
+%%% Выравнивание и переносы %%%
+\tolerance 1414
+\hbadness 1414
+\emergencystretch 1.5em
+\hfuzz 0.3pt
+\vfuzz \hfuzz
+\clubpenalty=10000
+\widowpenalty=10000
+\brokenpenalty=4991
+
+%%% Таблицы и рисунки %%%
+\usepackage{graphicx, caption, subcaption}
+\graphicspath{{img/}}
+\captionsetup[figure]{font=small,width=\textwidth,name=Рисунок,justification=centering}
+\captionsetup[subfigure]{font=small}
+\captionsetup[table]{singlelinecheck=false,font=small,width=\textwidth,justification=justified}
+\captiondelim{ — }
+\setkeys{Gin}{width=\textwidth}
+\renewcommand{\thesubfigure}{\asbuk{subfigure}}
+\usepackage[section]{placeins}
+
+%%% Гиперссылки %%%
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linktoc=all,
+    linktocpage=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue
+}
+
+%%% Списки %%%
+\usepackage{enumitem}
+\renewcommand*{\labelitemi}{\normalfont{--}}
+\setlist{noitemsep, leftmargin=*}
+\setlist[1]{labelindent=\parindent}
+\setlist[2]{leftmargin=\parindent}
+\setlist[3]{leftmargin=\parindent}
+
+%%% Листинги %%%
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+    basicstyle=\small\ttfamily,
+    breaklines=true,
+    frame=single,
+    tabsize=2,
+    showstringspaces=false,
+    extendedchars=true,
+    inputencoding=utf8
+}
+
+%%% Нумерация объектов %%%
+\counterwithout{figure}{chapter}
+\counterwithout{equation}{chapter}
+\counterwithout{table}{chapter}
+
+%%% Доп. пакеты %%%
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{csquotes}
+
+%%% Конфигурация отчёта %%%
+\input{config}
+
+%%% Документ %%%
+\begin{document}
+
+\input{parts/title}
+
+\newpage
+\setcounter{page}{2}
+\OnehalfSpacing*
+\tableofcontents*
+
+\input{parts/intro}
+\input{parts/chap1}
+\input{parts/chap2}
+\input{parts/chap3}
+\input{parts/conclusion}
+
+\end{document}
